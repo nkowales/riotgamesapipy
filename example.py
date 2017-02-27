@@ -11,6 +11,12 @@ def main():
 	#print league[str(c["dairus"]["id"])]
 	print "Tier:", league[str(idnum)][0]["tier"], league[str(idnum)][0]["entries"][0]["division"]
 	print "Wins / Losses: ", league[str(idnum)][0]["entries"][0]["wins"], "/", league[str(idnum)][0]["entries"][0]["losses"]
+	
+	masteries = rito.getTopMasteries(str(idnum), 5)
+	#champlist
+	print "Darius' Top Masteries:"
+	
+	print masteries
 
 if __name__ == "__main__":
 	main()
