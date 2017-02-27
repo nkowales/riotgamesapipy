@@ -72,7 +72,7 @@ class riotgamesapipy:
 		rgames = r.json()
 		return rgames
 
-	### Leagues ###
+	### LEAGUES ###
 	def getLeagues(self, summonerIDs):
 		# get info on the leagues that a given summoner is a member of. Takes
 		# comma-separated summoner ids string
