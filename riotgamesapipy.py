@@ -135,16 +135,26 @@ class riotgamesapipy:
 	
 	### LoL STATUS ###
 	def getShardStatus(self):
+		#returns status of shard, or server
 		r = requests.get('https://' + self.region + '.api.pvp.net/lol/status/v1/shard?api_key=' + self.api_key)
 		shard = r.json()
 		return shard
 	
 	def getShards(self):
+		#returns list of shards, or servers
 		r = requests.get('https://' + self.region + '.api.pvp.net/lol/status/v1/shards?api_key=' + self.api_key)
 		shards = r.json()
 		return shards
 		
 	### MATCH ###
+	def getMatch(self, matchID, timeline = False):
+		#returns match by match ID, with timeline tag indicating whether to include timeline data or not
+		if timeline == True:
+			r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v2.2/match/' + str(matchID) + '?includeTimeline=true&api_key=' + self.api_key)
+		else:
+			r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v2.2/match/' + str(matchID) + '?includeTimeline=false&api_key=' + self.api_key)
+		match = r.json()
+		return match
 	
 	### MATCHLIST ###
 	
