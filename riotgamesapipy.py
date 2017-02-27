@@ -104,7 +104,9 @@ class riotgamesapipy:
 	
 	def getChampionDataByID(self, championID):
 		r = requests.get('https://global.api.pvp.net/api/lol/static-data/' + self.region + '/v1.2/champion/' + str(championID) + '?api_key=' + self.api_key)
-	
+		champion = r.json()
+		return champion
+		
 	#def getItemData
 	
 	#def getItemDataByID
@@ -132,8 +134,16 @@ class riotgamesapipy:
 	#def getVersionData
 	
 	### LoL STATUS ###
+	def getShardStatus(self):
+		r = requests.get('https://' + self.region + '.api.pvp.net/lol/status/v1/shard?api_key=' + self.api_key)
+		shard = r.json()
+		return shard
 	
-	
+	def getShards(self):
+		r = requests.get('https://' + self.region + '.api.pvp.net/lol/status/v1/shards?api_key=' + self.api_key)
+		shards = r.json()
+		return shards
+		
 	### MATCH ###
 	
 	### MATCHLIST ###
