@@ -18,7 +18,7 @@ class riotgamesapipy:
 		return champs
 
 	def getChampionByID(self, championID):
-		# champion by champion ID
+	# champion by champion ID
 		r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v1.2/champion/' + str(championID) + '?api_key='+ self.api_key)
 		champ = r.json()
 		return champ
