@@ -2,9 +2,10 @@ import requests
 
 class riotgamesapipy:
  
-	def __init__(self, api_key, region = 'na'):
+	def __init__(self, api_key, region = 'na', server = 'NA1'):
 		self.api_key = api_key
 		self.region = region
+		self.server = server
 
 	def getChampions(self, ftp = False):
 	# all the league champions
@@ -17,6 +18,11 @@ class riotgamesapipy:
 		champs = r.json()
 		return champs
 
+	def getCurrentGame(self, summonerID):
+		r = requests.get('https://' + self.region + '.api.pvp.net/observer-mode/rest/consumer/getSpectatorGameInfo/' + self.server + '/' + str(summonerID) + '?api_key=' + self.api_key)
+		cgame = r.json()
+		return cgame
+		
 	def getChampionByID(self, championID):
 		# champion by champion ID
 		r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v1.2/champion/' + str(championID) + '?api_key='+ self.api_key)
