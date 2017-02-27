@@ -100,6 +100,35 @@ class riotgamesapipy:
 		return league
 		
 	### LoL STATIC DATA ###
+	#def getChampionData
+	
+	#def getChampionDataByID
+	
+	#def getItemData
+	
+	#def getItemDataByID
+	
+	#def getLanguageStrings
+	
+	#def getLanguages
+	
+	#def getMapData
+	
+	#def getMasteryData
+	
+	#def getMasteryDataByID
+	
+	#def getRealmData
+	
+	#def getRuneData
+	
+	#def getRuneDataByID
+	
+	#def getSummonerSpellData
+	
+	#def getSummonerSpellDataByID
+	
+	#def getVersionData
 	
 	### LoL STATUS ###
 	
