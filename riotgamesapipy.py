@@ -17,6 +17,12 @@ class riotgamesapipy:
 		champs = r.json()
 		return champs
 
+	def getChampionByID(self, championID):
+		# champion by champion ID
+		r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v1.2/champion/' + championID + '?api_key='+ self.api_key)
+		champ = r.json()
+		return champ
+		
 	def getPlayerMasteries(self, summonerID):
 	# get that summoner's champion masteries, search by ID
 		r = requests.get('https://' + self.region + '.api.pvp.net/championmastery/location/' + self.region + '1/player/' + str(summonerID) + '/champions?api_key=' + self.api_key)
