@@ -102,7 +102,7 @@ class riotgamesapipy:
 	### LoL STATIC DATA ###
 	#def getChampionData
 	
-	def getChampionDataByID(self, championID)
+	def getChampionDataByID(self, championID):
 		r = requests.get('https://global.api.pvp.net/api/lol/static-data/' + self.region + '/v1.2/champion/' + str(championID) + '?api_key=' + self.api_key)
 	
 	#def getItemData
@@ -132,6 +132,7 @@ class riotgamesapipy:
 	#def getVersionData
 	
 	### LoL STATUS ###
+	
 	
 	### MATCH ###
 	
