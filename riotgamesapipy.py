@@ -19,12 +19,13 @@ class riotgamesapipy:
 		return champs
 
 	def getCurrentGame(self, summonerID):
+	# get the current game by summonerID
 		r = requests.get('https://' + self.region + '.api.pvp.net/observer-mode/rest/consumer/getSpectatorGameInfo/' + self.server + '/' + str(summonerID) + '?api_key=' + self.api_key)
 		cgame = r.json()
 		return cgame
 		
 	def getChampionByID(self, championID):
-	# champion by champion ID
+	# get champion by champion ID
 		r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v1.2/champion/' + str(championID) + '?api_key='+ self.api_key)
 		champ = r.json()
 		return champ
@@ -65,3 +66,24 @@ class riotgamesapipy:
 		r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/na/v1.3/game/by-summoner/' + str(summonerID) + '/recent?api_key=' + self.api_key)
 		rgames = r.json()
 		return rgames
+
+
+	### Leagues ###
+	def getLeagues(self, summonerIDs):
+	# get info on the leagues that a given summoner is a member of. Takes
+	# comma-separated summoner ids string
+		r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v2.5/league/by-summoner/' + str(summonerIDs) + '?api_key=' + self.api_key)
+		leagues = r.json()
+		return leagues
+
+	def getLeagueEntries(self, summonerIDs):
+
+                r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v2.5/league/by-summoner/' + str(summonerIDs) + '/entry?api_key=' + self.api_key)
+                leagues = r.json()
+                return leagues
+
+	def getSummonerbyName(self, summonerN):
+		r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v1.4/summoner/by-name/' + str(summonerN) + '?api_key=' + self.api_key)
+
+		summoner = r.json()
+		return summoner
