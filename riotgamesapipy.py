@@ -157,13 +157,32 @@ class riotgamesapipy:
 		return match
 	
 	### MATCHLIST ###
-	
+	#def getMatchList(self):
+		
 	### STATS ###
+	def getRankedStats(self, summonerID, season):
+		#seasons include SEASON2017, SEASON2016, SEASON2015, SEASON2014, and SEASON3
+		r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v1.3/stats/by-summoner/'+ summonerID + '/ranked?season=' + season + '&api_key=' + self.api_key)
+		stats = r.json()
+		return stats
+	
+	def getStatsSummary(self, summonerID, season):
+		r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v1.3/stats/by-summoner/'+ summonerID + '/summary?season=' + season + '&api_key=' + self.api_key)
+		stats = r.json()
+		return stats
 	
 	### SUMMONER ###
 	def getSummonerbyName(self, summonerN):
 		r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v1.4/summoner/by-name/' + str(summonerN) + '?api_key=' + self.api_key)
 		summoner = r.json()
 		return summoner
+		
+	#def getSummonersByID(self):
+	
+	#def getSummonerNamesByID(self):
+	
+	#def getSummonerMasteries(self, summonerID):
+	
+	#def getSummonerRunes(self, summonerID):
 
 	### PROJECT SPECIFIC ###
