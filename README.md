@@ -1,2 +1,2 @@
 # riotgamesapipy
-Use to make calls to riot games api.
+Python library used to make calls to riot games api.
