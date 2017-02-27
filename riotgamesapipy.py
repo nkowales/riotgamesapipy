@@ -72,15 +72,16 @@ class riotgamesapipy:
 	def getLeagues(self, summonerIDs):
 	# get info on the leagues that a given summoner is a member of. Takes
 	# comma-separated summoner ids string
+	#excludes inactive teams and players except players in the input list
 		r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v2.5/league/by-summoner/' + str(summonerIDs) + '?api_key=' + self.api_key)
 		leagues = r.json()
 		return leagues
 
 	def getLeagueEntries(self, summonerIDs):
-
-                r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v2.5/league/by-summoner/' + str(summonerIDs) + '/entry?api_key=' + self.api_key)
-                leagues = r.json()
-                return leagues
+		#gets info on leages summoner is a member of. Takes comma separated string of ids		
+		r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v2.5/league/by-summoner/' + str(summonerIDs) + '/entry?api_key=' + self.api_key)
+		leagues = r.json()
+		return leagues
 
 	def getSummonerbyName(self, summonerN):
 		r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v1.4/summoner/by-name/' + str(summonerN) + '?api_key=' + self.api_key)
