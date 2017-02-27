@@ -47,3 +47,15 @@ class riotgamesapipy:
 		r = requests.get('https://' + self.region + '.api.pvp.net/championmastery/location/' + self.region + '1/player/' + str(summonerID) + '/topchampions?count=' + str(retrieve) + '&api_key=' + self.api_key)
 		top = r.json()
 		return top
+
+	def getFeaturedGames(self):
+	# get info on the highest ranking current games
+		r = requests.get('https://' + self.region + '.api.pvp.net/observer-mode/rest/featured?api_key=' + sefl.api_key)
+		fgames = r.json()
+		return fgames
+
+	def getPlayerRecentGames(self, summonerID):
+	# info on a player's recent games
+		r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/na/v1.3/game/by-summoner/' + str(summonerID) + '/recent?api_key=' + self.api_key)
+		rgames = r.json()
+		return rgames
