@@ -1,6 +1,6 @@
 import requests
 
-## SR stands for summoners rift which is the name of the 5x5 map, TT stands for twisted treeline which is the name of the 3x3 map
+# SR stands for summoners rift which is the name of the 5x5 map, TT stands for twisted treeline which is the name of the 3x3 map
 
 class riotgamesapipy:
  
@@ -9,22 +9,15 @@ class riotgamesapipy:
 		self.region = region
 		self.server = server
 
+	### CHAMPION ###
 	def getChampions(self, ftp = False):
 	# all the league champions
 		if ftp == False:
 			r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v1.2/champion?freeToPlay=false&api_key='+ self.api_key)
-			
 		else:
 			r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v1.2/champion?freeToPlay=true&api_key='+ self.api_key)
-
 		champs = r.json()
 		return champs
-
-	def getCurrentGame(self, summonerID):
-	# get the current game by summonerID
-		r = requests.get('https://' + self.region + '.api.pvp.net/observer-mode/rest/consumer/getSpectatorGameInfo/' + self.server + '/' + str(summonerID) + '?api_key=' + self.api_key)
-		cgame = r.json()
-		return cgame
 		
 	def getChampionByID(self, championID):
 	# get champion by champion ID
@@ -32,6 +25,7 @@ class riotgamesapipy:
 		champ = r.json()
 		return champ
 		
+	### CHAMPION MASTERY ###
 	def getPlayerMasteries(self, summonerID):
 	# get that summoner's champion masteries, search by ID
 		r = requests.get('https://' + self.region + '.api.pvp.net/championmastery/location/' + self.region + '1/player/' + str(summonerID) + '/champions?api_key=' + self.api_key)
@@ -57,24 +51,32 @@ class riotgamesapipy:
 		top = r.json()
 		return top
 
+	### CURRENT GAME ###
+	def getCurrentGame(self, summonerID):
+	# get the current game by summonerID
+		r = requests.get('https://' + self.region + '.api.pvp.net/observer-mode/rest/consumer/getSpectatorGameInfo/' + self.server + '/' + str(summonerID) + '?api_key=' + self.api_key)
+		cgame = r.json()
+		return cgame
+
+	### FEATURED GAMES ###
 	def getFeaturedGames(self):
 	# get info on the highest ranking current games
 		r = requests.get('https://' + self.region + '.api.pvp.net/observer-mode/rest/featured?api_key=' + sefl.api_key)
 		fgames = r.json()
 		return fgames
 
+	### GAME ###
 	def getPlayerRecentGames(self, summonerID):
 	# info on a player's recent games
 		r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/na/v1.3/game/by-summoner/' + str(summonerID) + '/recent?api_key=' + self.api_key)
 		rgames = r.json()
 		return rgames
 
-
 	### Leagues ###
 	def getLeagues(self, summonerIDs):
-	# get info on the leagues that a given summoner is a member of. Takes
-	# comma-separated summoner ids string
-	#excludes inactive teams and players except players in the input list
+		# get info on the leagues that a given summoner is a member of. Takes
+		# comma-separated summoner ids string
+		#excludes inactive teams and players except players in the input list
 		r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v2.5/league/by-summoner/' + str(summonerIDs) + '?api_key=' + self.api_key)
 		leagues = r.json()
 		return leagues
@@ -96,9 +98,21 @@ class riotgamesapipy:
 		r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v2.5/league/master?type=' + Qname + '&api_key=' + self.api_key)
 		league = r.json()
 		return league
-
+		
+	### LoL STATIC DATA ###
+	
+	### LoL STATUS ###
+	
+	### MATCH ###
+	
+	### MATCHLIST ###
+	
+	### STATS ###
+	
+	### SUMMONER ###
 	def getSummonerbyName(self, summonerN):
 		r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v1.4/summoner/by-name/' + str(summonerN) + '?api_key=' + self.api_key)
-
 		summoner = r.json()
 		return summoner
+
+	### PROJECT SPECIFIC ###
