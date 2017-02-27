@@ -29,3 +29,15 @@ class riotgamesapipy:
 		r = requests.get('https://' + self.region + '.api.pvp.net/championmastery/location/' + self.region + '1/player/' + str(summonerID) + '/champion/' + str(championID) + '?api_key=' + self.api_key)
 		mastery = r.json()
 		return mastery
+
+	def getMasteryScore(self, summonerID):
+	# get the total number of summoner mastery points, int
+		r = requests.get('https://' + self.region + '.api.pvp.net/championmastery/location/' + self.region + '1/player/' + str(summonerID) + '/score?api_key=' + self.api_key)
+		score = r.json()
+		return int(score)
+
+	def getTopMasteries(self, summonerID, retrieve):
+	# get the player's champions w highest masteries
+		r = requests.get('https://' + self.region + '.api.pvp.net/championmastery/location/' + self.region + '1/player/' + str(summonerID) + '/topchampions?count=' + str(retrieve) + '&api_key=' + self.api_key)
+		top = r.json()
+		return top
