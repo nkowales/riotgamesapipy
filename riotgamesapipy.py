@@ -1,5 +1,7 @@
 import requests
 
+## SR stands for summoners rift which is the name of the 5x5 map, TT stands for twisted treeline which is the name of the 3x3 map
+
 class riotgamesapipy:
  
 	def __init__(self, api_key, region = 'na', server = 'NA1'):
@@ -82,6 +84,18 @@ class riotgamesapipy:
 		r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v2.5/league/by-summoner/' + str(summonerIDs) + '/entry?api_key=' + self.api_key)
 		leagues = r.json()
 		return leagues
+		
+	def	getChallenger(self, Qname):
+		#return challenger league for given ranked queue, RANKED_FLEX_SR, RANKED_FLEX_TT, RANKED_SOLO_5x5, RANKED_TEAM_5x5, or RANKED_TEAM_3x3, 
+		r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v2.5/league/challenger?type=' + Qname + '&api_key=' + self.api_key)
+		league = r.json()
+		return league
+		
+	def	getMaster(self, Qname):
+		#return Master league for given ranked queue, RANKED_FLEX_SR, RANKED_FLEX_TT, RANKED_SOLO_5x5, RANKED_TEAM_5x5, or RANKED_TEAM_3x3, 
+		r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v2.5/league/master?type=' + Qname + '&api_key=' + self.api_key)
+		league = r.json()
+		return league
 
 	def getSummonerbyName(self, summonerN):
 		r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v1.4/summoner/by-name/' + str(summonerN) + '?api_key=' + self.api_key)
