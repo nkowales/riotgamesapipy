@@ -108,14 +108,12 @@ class riotgamesapipy:
 		return champion
 		
 	#def getItemData
-
 	def getItemData(self):
 		r = requests.get('https://global.api.pvp.net/api/lol/static-data/' + self.region + '/v1.2/item?itemListData=all&api_key=' + self.api_key)
 		items = r.json()
 		return items
 	
 	#def getItemDataByID
-
 	def getItemDataByID(self, itemID):
 		r = requests.get('https://global.api.pvp.net/api/lol/static-data/' + self.region + '/v1.2/item/' + str(itemID) + '?itemData=all&api_key=' + self.api_key)
 		item = r.json()
@@ -126,14 +124,12 @@ class riotgamesapipy:
 	#def getLanguages
 	
 	#def getMapData
-
 	def getMapData(self):
 		r = requests.get('https://global.api.pvp.net/api/lol/static-data/' + self.region + '/v1.2/map?api_key=' + self.api_key)
 		mapdata = r.json()
 		return mapdata
 	
 	#def getMasteryData
-	
 	def getMasteryData(self):
 		r = requests.get('https://global.api.pvp.net/api/lol/static-data/' + self.region + '/v1.2/mastery?api_key=' + self.api_key)
 		mastery = r.json()
@@ -141,9 +137,14 @@ class riotgamesapipy:
 
 	#def getMasteryDataByID
 	
+	
 	#def getRealmData
 	
 	#def getRuneData
+	def getRuneData(self):
+		r = requests.get('https://global.api.pvp.net/api/lol/static-data/' + self.region + 'v1.2/rune?api_key' + self.api_key)
+		rune = r.json()
+		return rune
 	
 	#def getRuneDataByID
 	
