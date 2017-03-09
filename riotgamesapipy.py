@@ -136,10 +136,17 @@ class riotgamesapipy:
 		return mastery
 
 	#def getMasteryDataByID
-	
+	def getMasteryDataByID(self, masteryID):
+		r = requests.get('https://global.api.pvp.net/api/lol/static-data/' + self.region + '/v1.2/mastery/' + str(masteryID) + '?api_key=' + self.api_key)
+		mastery = r.json()
+		return mastery
 	
 	#def getRealmData
-	
+	def getRealmData(self):
+		r - requests.get('https://global.api.pvp.net/api/lol/static-data/' + self.region + '/v1.2/realm?api_key=' + self.api_key)
+		realm = r.json()
+		return realm
+
 	#def getRuneData
 	def getRuneData(self):
 		r = requests.get('https://global.api.pvp.net/api/lol/static-data/' + self.region + 'v1.2/rune?api_key' + self.api_key)
@@ -147,13 +154,26 @@ class riotgamesapipy:
 		return rune
 	
 	#def getRuneDataByID
-	
+	def getRuneDataByID(self, runeID):
+		r = requests.get('https://global.api.pvp.net/api/lol/static-data/' + self.region + 'v1.2/rune/' + str(runeID) + '?api_key' + self.api_key)
+		rune = r.json()
+		return rune
+
 	#def getSummonerSpellData
+	def getSummonerSpellData(self):
+		r = requests.get('https://global.api.pvp.net/api/lol/static-data/' + self.region + '/v1.2/summoner-spell?api_key=' + self.api_key)
+		spell = r.json()
+		return spell
 	
 	#def getSummonerSpellDataByID
+	def getSummonerSpellDataByID(self, spellID):
+		r = requests.get('https://global.api.pvp.net/api/lol/static-data/' + self.region + '/v1.2/summoner-spell/' + str(spellID) + '?api_key=' + self.api_key)
+		spell = r.json()
+		return spell
 	
 	#def getVersionData
-	
+
+
 	### LoL STATUS ###
 	def getShardStatus(self):
 		#returns status of shard, or server
@@ -178,7 +198,7 @@ class riotgamesapipy:
 		return match
 	
 	### MATCHLIST ###
-	#def getMatchList(self):
+#	def getMatchList(self, summonerID):
 		
 	### STATS ###
 	def getRankedStats(self, summonerID, season):
