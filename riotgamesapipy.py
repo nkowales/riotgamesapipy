@@ -76,7 +76,7 @@ class riotgamesapipy:
 	def getLeagues(self, summonerIDs):
 		# get info on the leagues that a given summoner is a member of. Takes
 		# comma-separated summoner ids string
-		#excludes inactive teams and players except players in the input list
+		# excludes inactive teams and players except players in the input list
 		r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v2.5/league/by-summoner/' + str(summonerIDs) + '?api_key=' + self.api_key)
 		leagues = r.json()
 		return leagues
@@ -198,7 +198,29 @@ class riotgamesapipy:
 		return match
 	
 	### MATCHLIST ###
-#	def getMatchList(self, summonerID):
+        def getMatchList(self, summonerID, rankedQueues=None, endTime=None, endIndex=None, beginTime=None, beginIndex=None, seasons=None, championIds=None):
+                options=''
+                if rankedQueues:
+                        options = options + 'rankedQueues=' + rankedQueues + '&'
+                if endTime:
+                        options = options + 'endTime=' + endTime + '&'
+                if endIndex:
+                        options = options + 'endIndex=' + endIndex + '&'
+                if beginTime:
+                        options = options + 'beginTime=' + beginTime + '&'
+                if beginIndex:
+                        options = options + 'beginIndex=' + beginIndex + '&'
+                if seasons:
+                        options = options + 'seasons=' + str(seasons) + '&'
+                if championIds:
+                        options = options + 'championIds=' + championIds + '&'
+                
+                # use None?
+                #r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v2.2/matchlist/by-summoner' + str(summonerID) + '?api_key=' + self.api_key)
+                r = requests.get('https://' + self.region + '.api.pvp.net/api/lol/' + self.region + '/v2.2/matchlist/by-summoner/' + str(summonerID) + '?' + options + 'api_key=' + self.api_key)
+                matchlist = r.json()
+                return matchlist
+
 		
 	### STATS ###
 	def getRankedStats(self, summonerID, season):
