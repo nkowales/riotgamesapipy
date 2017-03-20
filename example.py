@@ -4,6 +4,8 @@ from info import API_KEY
 def main():
         rito = riotgamesapipy.riotgamesapipy(API_KEY)
 
+	matches=[] # list of games we got info from
+
 	# for non-challenger entries - 
 	# gotta find a player in other leagues
 	silverchamp = rito.getLeagues(51575588)
@@ -14,15 +16,18 @@ def main():
                 matchlist = rito.getMatchList(str(entry["playerOrTeamId"]), seasons='SEASON2016,PRESEASON2017')
                 for matl in matchlist["matches"]:
                         matchID = matl["matchId"]
-                        match = rito.getMatch(matchID, timeline=True)
-                        for part in match["participants"]:
-                                grabStats(rito, part)
+			if matchID not in matches:
+				matches.append(matchID)
+                        	match = rito.getMatch(matchID, timeline=True)
+	                        for part in match["participants"]:
+					grabStats(rito, part)
                                 
-                                # rival champ stats!
-                                for part2 in match["participants"]:
-                                        if part["timeline"]["lane"] == part2["timeline"]["lane"] and part["timeline"]["role"] == part2["timeline"]["role"] and part["participantId"] != part2["participantId"]:
-                                                print "Rival Stats!!"
-                                                grabStats(rito, part2)
+					# rival champ stats!
+                        		for part2 in match["participants"]:
+                                		if part["timeline"]["lane"] == part2["timeline"]["lane"] and part["timeline"]["role"] == part2["timeline"]["role"] and part["participantId"] != part2["participantId"]:
+                                        	        print "Rival Stats!!"
+                                                	grabStats(rito, part2)
+
                         
                 
 def grabStats(rito, part):
