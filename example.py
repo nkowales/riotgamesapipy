@@ -7,12 +7,19 @@ def main():
 	matches=[] # list of games we got info from
 
 	# for non-challenger entries - 
-	# gotta find a player in other leagues
+	bronzechamp = rito.getLeagues(37517949)
+	bronze = bronzechamp["37517949"][0]
 	silverchamp = rito.getLeagues(51575588)
 	silver = silverchamp["51575588"][0]
+	goldchamp = rito.getLeagues(35707215)
+	gold = goldchamp["35707215"][0]
+	platinumchamp = rito.getLeagues(31593648)
+	platinum = platinumchamp["31593648"][0]
 
+	master = rito.getMaster('RANKED_SOLO_5x5')
 	challenger = rito.getChallenger('RANKED_SOLO_5x5')
-        for entry in challenger["entries"]: # replace "challenger" with other league
+
+        for entry in bronze["entries"]: # replace "challenger" with other league
                 matchlist = rito.getMatchList(str(entry["playerOrTeamId"]), seasons='SEASON2016,PRESEASON2017')
                 for matl in matchlist["matches"]:
                         matchID = matl["matchId"]
