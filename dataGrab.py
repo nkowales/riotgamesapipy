@@ -19,22 +19,33 @@ def main():
 	master = rito.getMaster('RANKED_SOLO_5x5')
 	challenger = rito.getChallenger('RANKED_SOLO_5x5')
 
-        for entry in bronze["entries"]: # replace "challenger" with other league
+        for entry in platinum["entries"]: # replace "challenger" with other league
                 matchlist = rito.getMatchList(str(entry["playerOrTeamId"]), seasons='SEASON2016,PRESEASON2017')
                 for matl in matchlist["matches"]:
                         matchID = matl["matchId"]
 			if matchID not in matches:
 				matches.append(matchID)
+				print matchID
                         	match = rito.getMatch(matchID, timeline=True)
 	                        for part in match["participants"]:
-					grabStats(rito, part)
+			#		grabStats(rito, part)
+					champ = rito.getChampionDataByID(part["championId"])
+					if part["timeline"]["lane"] == "BOTTOM" and part["timeline"]["role"] == "DUO_CARRY":
+				                role = "ADCARRY"
+					elif part["timeline"]["lane"] == "BOTTOM" and part["timeline"]["role"] == "DUO_SUPPORT":
+                				role = "SUPPORT"
+				        else:
+                				role = part["timeline"]["lane"]
+					print role, champ["name"], part["stats"]["winner"]
                                 
 					# rival champ stats!
-                        		for part2 in match["participants"]:
-                                		if part["timeline"]["lane"] == part2["timeline"]["lane"] and part["timeline"]["role"] == part2["timeline"]["role"] and part["participantId"] != part2["participantId"]:
-                                        	        print "Rival Stats!!"
-                                                	grabStats(rito, part2)
+                        		#for part2 in match["participants"]:
+                                	#	if part["timeline"]["lane"] == part2["timeline"]["lane"] and part["timeline"]["role"] == part2["timeline"]["role"] and part["participantId"] != part2["participantId"]:
+                                        #	        print "Rival Stats!!"
+                                         #       	grabStats(rito, part2)
                 
+
+
 
 def grabStats(rito, part):
         champ = rito.getChampionDataByID(part["championId"])
