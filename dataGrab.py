@@ -68,7 +68,7 @@ def grabStats(rito, part):
         print part["stats"]["magicDamageDealt"]
         print part["stats"]["goldEarned"]
         print part["stats"]["totalDamageTaken"]
-        print part["stats"]["totalHeal"] # i assume healing others?
+        print part["stats"]["totalHeal"] # i assume healing others? healing done to allies, including self, excluding health regeneration and lifesteal
 
 
 if __name__ == "__main__":
