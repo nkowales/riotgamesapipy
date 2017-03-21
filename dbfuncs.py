@@ -21,9 +21,8 @@ def findmatchups(position, champid):
 
 	cnx = mysql.connector.connect(user=USER, password=PASSWORD, host=HOST, database='lol')
 	cursor = cnx.cursor()
-	query = ('SELECT * FROM games')
-	#data = (position, champid)
-	stuff =[]
+	query = ('SELECT * FROM games WHERE ' + position + ' = ' + champid)
+	stuff =[] 
 	cursor.execute(query)
 	for (gameid, top1, top2, jungle1, jungle2, mid1, mid2, bot1, bot2, supp1, supp2, win) in cursor:
 		stuff.append(gameid)
