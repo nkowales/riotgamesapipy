@@ -16,7 +16,7 @@ def insertgame(i, t1, t2, j1, j2, m1, m2, b1, b2, s1, s2, w):
 	cursor.close()
 	cnx.close()
 
-def findwin(position, champid, enemyid):
+def findwin(position, champid, enemyid):#position same as role, lane assignment. should be top, jungle, mid, bot, or supp
 	cnx = mysql.connector.connect(user=info.USER, password=info.PASSWORD, host=info.HOST, database=info.DATABASE, port=info.PORT)
 	cursor = cnx.cursor()
 	query = ('SELECT COUNT(*) FROM games WHERE ( ' + position + '1 = ' + champid + ' AND ' + position + '2 = ' + enemyid + ' AND win = 1 ) OR ( ' + position + '2 = ' + champid + ' AND ' + position + '1 = ' + enemyid + ' AND win = 0 )')
