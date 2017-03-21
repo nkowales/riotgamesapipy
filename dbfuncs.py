@@ -46,7 +46,10 @@ def findrates(position, champid):
 	for key in ID2NAME:
 		winsagainst[key] = findwin(position, champid, key)
 		losesagainst[key] = findlose(position, champid, key)
-		percents[key] = ((float(winsagainst[key])/(float(winsagainst[key])+float(losesagainst[key])))*100.0)
+		if((winsagainst[key] + losesagainst[key]) > 0):
+			percents[key] = ((float(winsagainst[key])/(float(winsagainst[key])+float(losesagainst[key])))*100.0)
+		else:
+			percents[key] = 0.0
 		if((int(winsagainst[key])+int(losesagainst[key])) > 30):
 			isvalid[key]=1
 		else:
