@@ -2,7 +2,7 @@ import riotgamesapipy
 from info import API_KEY
 
 def main():
-        rito = riotgamesapipy.riotgamesapipy(API_KEY)
+	rito = riotgamesapipy.riotgamesapipy(API_KEY)
 
 	matches=[] # list of games we got info from
 

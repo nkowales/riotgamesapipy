@@ -4,10 +4,11 @@ import requests
 
 class riotgamesapipy:
  
-	def __init__(self, api_key, region = 'na', server = 'NA1'):
+	def __init__(self, api_key, region = 'na', server = 'NA1', locale = 'en_US'):
 		self.api_key = api_key
 		self.region = region
 		self.server = server
+		self.locale = locale
 
 
 	### CHAMPION ###
@@ -111,6 +112,10 @@ class riotgamesapipy:
 		
 	### LoL STATIC DATA ###
 	#def getChampionData
+	def getChampionData(self):
+		r = requests.get('https://global.api.riotgames.com/api/lol/static-data/'+self.region+'/v1.2/champion?locale='+self.locale+'&api_key='+self.api_key)
+		champions = r.json()
+		return champions
 	
 	def getChampionDataByID(self, championID):
 		r = requests.get('https://global.api.pvp.net/api/lol/static-data/' + self.region + '/v1.2/champion/' + str(championID) + '?api_key=' + self.api_key)
