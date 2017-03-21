@@ -26,21 +26,15 @@ def main():
                         matchID = matl["matchId"]
 			role = [None] * 10
 			if matchID not in matches:
-				sleep(1)
+				time.sleep(1)
 				matches.append(matchID)
                         	match = rito.getMatch(matchID, timeline=True)
 	                        for part in match["participants"]:
 					if part["timeline"]["lane"] == "BOTTOM" and part["timeline"]["role"] == "DUO_CARRY":
 						if part["teamId"] == 0:
-							print part["championId"]
 							role[6] = str(part["championId"])
-							print role[6]
 						else:
-							print part["championId"]
-
 							role[7] = str(part["championId"])
-							print role[7]
-							print role[6], "what"
 					elif part["timeline"]["lane"] == "BOTTOM" and part["timeline"]["role"] == "DUO_SUPPORT":
 						if part["teamId"] == 0:
 							role[8] = str(part["championId"])
