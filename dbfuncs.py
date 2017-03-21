@@ -17,11 +17,20 @@ def insertgame(i, t1, t2, j1, j2, m1, m2, b1, b2, s1, s2, w):
 	cursor.close()
 	cnx.close()
 
-def findwins(position, champid):
-	winsagainst = {}
+def findwin(position, champid, enemyid):
 	cnx = mysql.connector.connect(user=info.USER, password=info.PASSWORD, host=info.HOST, database=info.DATABASE, port=info.PORT)
 	cursor = cnx.cursor()
-	query = ('SELECT COUNT(*) FROM games WHERE ( ' + position + '1 = ' + champid + ' AND win = 1 ) OR (' + position + '2 = ' + champid + ' AND win = 0 )')
+	query = ('SELECT COUNT(*) FROM games WHERE ( ' + position + '1 = ' + champid + ' AND ' + position + '2 = ' + enemyid + ' AND win = 1 ) OR ( ' + position + '2 = ' + champid + ' AND ' + position + '1 = ' + enemyid + ' AND win = 0 )')
+	cursor.execute(query)
+	result=cursor.fetchone()
+	cursor.close()
+	cnx.close()
+	return result[0]
+
+def findlose(position, champid, enemyid):
+	cnx = mysql.connector.connect(user=info.USER, password=info.PASSWORD, host=info.HOST, database=info.DATABASE, port=info.PORT)
+	cursor = cnx.cursor()
+	query = ('SELECT COUNT(*) FROM games WHERE ( ' + position + '1 = ' + champid + ' AND ' + position + '2 = ' + enemyid + ' AND win = 0 ) OR ( ' + position + '2 = ' + champid + ' AND ' + position + '1 = ' + enemyid + ' AND win = 1 )')
 	cursor.execute(query)
 	result=cursor.fetchone()
 	cursor.close()
