@@ -3,8 +3,7 @@ import info
 from id2name import NAME2ID
 from id2name import ID2NAME
 
-winsagainst = {}
-losesagainst = {}
+
 
 def insertgame(i, t1, t2, j1, j2, m1, m2, b1, b2, s1, s2, w):
 
@@ -36,3 +35,28 @@ def findlose(position, champid, enemyid):
 	cursor.close()
 	cnx.close()
 	return result[0]
+
+
+def findrates(position, champid):
+	results = {}
+	winsagainst = {}
+	losesagainst = {}
+	percents = {}
+	isvalid = {}
+	for key in ID2NAME:
+		winsagainst[key] = findwin(position, champid, key)
+		losesagainst[key] = findlose(position, champid, key)
+		percents[key] = ((float(winsagainst[key])/(float(winsagainst[key])+float(losesagainst[key])))*100.0)
+		if((int(winsagainst[key])+int(losesagainst[key])) > 30):
+			isvalid[key]=1
+		else:
+			isvalid[key] = 0
+			
+	results['wins'] = winsagainst
+	results['loses'] = losesagainst
+	results['winrates'] = percents
+	results['validity'] = isvalid
+	return results
+
+
+		
