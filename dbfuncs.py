@@ -1,14 +1,14 @@
 import mysql.connector
-from info import USER
-from info import PASSWORD
-from info import HOST
+import info
 from id2name import NAME2ID
 from id2name import ID2NAME
 
+winsagainst = {}
+losesagainst = {}
 
 def insertgame(i, t1, t2, j1, j2, m1, m2, b1, b2, s1, s2, w):
 
-	cnx = mysql.connector.connect(user=USER, password=PASSWORD, host=HOST, database='lol')
+	cnx = mysql.connector.connect(user=info.USER, password=info.PASSWORD, host=info.HOST, database=info.DATABASE, port=info.PORT)
 	cursor = cnx.cursor()
 	add_game = ("INSERT INTO games (gameid, top1, top2, jungle1, jungle2, mid1, mid2, bot1, bot2, supp1, supp2, win) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)")
 	game_data = (i, t1, t2, j1, j2, m1, m2, b1, b2, s1, s2, w)
@@ -17,15 +17,13 @@ def insertgame(i, t1, t2, j1, j2, m1, m2, b1, b2, s1, s2, w):
 	cursor.close()
 	cnx.close()
 
-def findmatchups(position, champid):
-
-	cnx = mysql.connector.connect(user=USER, password=PASSWORD, host=HOST, database='lol')
+def findwins(position, champid):
+	winsagainst = {}
+	cnx = mysql.connector.connect(user=info.USER, password=info.PASSWORD, host=info.HOST, database=info.DATABASE, port=info.PORT)
 	cursor = cnx.cursor()
-	query = ('SELECT * FROM games WHERE ' + position + ' = ' + champid)
-	stuff =[] 
+	query = ('SELECT COUNT(*) FROM games WHERE ( ' + position + '1 = ' + champid + ' AND win = 1 ) OR (' + position + '2 = ' + champid + ' AND win = 0 )')
 	cursor.execute(query)
-	for (gameid, top1, top2, jungle1, jungle2, mid1, mid2, bot1, bot2, supp1, supp2, win) in cursor:
-		stuff.append(gameid)
+	result=cursor.fetchone()
 	cursor.close()
 	cnx.close()
-	return stuff
+	return result[0]
