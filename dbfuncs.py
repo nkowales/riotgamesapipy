@@ -3,7 +3,7 @@ from info import USER
 from info import PASSWORD
 from info import HOST
 
-def insertgame(i, t1, t2, j1, j2, m1, m2, b1, b2, s1, s2, w)
+def insertgame(i, t1, t2, j1, j2, m1, m2, b1, b2, s1, s2, w):
 
 	cnx = mysql.connector.connect(user=USER, password=PASSWORD, host=HOST, database='lol')
 	cursor = cnx.cursor()
@@ -14,4 +14,5 @@ def insertgame(i, t1, t2, j1, j2, m1, m2, b1, b2, s1, s2, w)
 	cursor.close()
 	cnx.close()
 
-
+def findmatchups(champname):
+	
