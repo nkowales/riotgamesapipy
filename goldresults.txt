@@ -1,9 +1,9 @@
 2322261605
-BOTTOM Draven False
+SUPPORT Draven False
 JUNGLE Zac False
 TOP Fiora False
 MIDDLE Katarina False
-BOTTOM Thresh False
+ADCARRY Thresh False
 MIDDLE Cassiopeia True
 TOP Gnar True
 JUNGLE Lee Sin True
@@ -289,7 +289,7 @@ TOP Sion True
 ADCARRY Twitch True
 SUPPORT Blitzcrank True
 JUNGLE Vi True
-JUNGLE Taliyah True
+MIDDLE Taliyah True
 MIDDLE Twisted Fate False
 ADCARRY Vayne False
 JUNGLE Lee Sin False
@@ -318,8 +318,8 @@ SUPPORT Sona False
 ADCARRY Ezreal False
 TOP Renekton False
 2315303889
-BOTTOM Lucian False
-BOTTOM Alistar False
+ADCARRY Lucian False
+SUPPORT Alistar False
 MIDDLE Viktor False
 JUNGLE Tryndamere False
 TOP Ekko False
@@ -329,11 +329,11 @@ ADCARRY Ezreal True
 TOP Renekton True
 JUNGLE Nidalee True
 2314447518
-BOTTOM Taric False
+SUPPORT Taric False
 JUNGLE Lee Sin False
-BOTTOM Jinx False
+ADCARRY Jinx False
 TOP Tryndamere False
-JUNGLE Ryze False
+MIDDLE Ryze False
 MIDDLE Aurelion Sol True
 SUPPORT Soraka True
 JUNGLE Amumu True
@@ -378,11 +378,11 @@ MIDDLE Yasuo False
 JUNGLE Nunu False
 SUPPORT Alistar False
 ADCARRY Caitlyn False
-BOTTOM Nautilus True
+SUPPORT Nautilus True
 JUNGLE Kindred True
 TOP Tryndamere True
 MIDDLE Fizz True
-BOTTOM Sivir True
+ADCARRY Sivir True
 2314399946
 SUPPORT Zilean True
 TOP Darius True
@@ -515,17 +515,6 @@ ADCARRY Tristana True
 MIDDLE Brand True
 TOP Irelia True
 SUPPORT Thresh True
-2309438087
-MIDDLE Darius False
-JUNGLE Blitzcrank False
-BOTTOM Nautilus False
-MIDDLE Lux False
-BOTTOM Jinx False
-JUNGLE Wukong True
-TOP Teemo True
-BOTTOM Caitlyn True
-MIDDLE Orianna True
-BOTTOM Sona True
 2309432868
 MIDDLE Syndra False
 ADCARRY Varus False
@@ -543,10 +532,10 @@ JUNGLE Alistar True
 SUPPORT Thresh True
 TOP Fiora True
 ADCARRY Lucian True
-BOTTOM Kog'Maw False
+SUPPORT Kog'Maw False
 TOP Vladimir False
 MIDDLE Katarina False
-BOTTOM Morgana False
+ADCARRY Morgana False
 JUNGLE Lee Sin False
 2309246484
 ADCARRY Corki False
@@ -574,7 +563,7 @@ JUNGLE Nocturne False
 TOP Jayce False
 MIDDLE Veigar False
 ADCARRY Sivir False
-MIDDLE Volibear False
+JUNGLE Volibear False
 SUPPORT Lulu False
 SUPPORT Thresh True
 MIDDLE Malzahar True
@@ -652,11 +641,11 @@ ADCARRY Lucian True
 SUPPORT Sona True
 JUNGLE Malzahar True
 TOP Darius True
-JUNGLE Evelynn True
+MIDDLE Evelynn True
 JUNGLE Amumu False
 ADCARRY Miss Fortune False
 TOP Yasuo False
-JUNGLE Lissandra False
+MIDDLE Lissandra False
 SUPPORT Alistar False
 2307168517
 ADCARRY Ezreal False
@@ -698,7 +687,7 @@ JUNGLE Kindred True
 SUPPORT Thresh True
 TOP Fizz True
 MIDDLE Xerath False
-MIDDLE Elise False
+JUNGLE Elise False
 SUPPORT Nautilus False
 ADCARRY Vayne False
 TOP Renekton False
