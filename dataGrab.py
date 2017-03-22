@@ -31,28 +31,28 @@ def main():
                         	match = rito.getMatch(matchID, timeline=True)
 	                        for part in match["participants"]:
 					if part["timeline"]["lane"] == "BOTTOM" and part["timeline"]["role"] == "DUO_CARRY":
-						if part["teamId"] == 0:
+						if part["teamId"] == 100:
 							role[6] = str(part["championId"])
 						else:
 							role[7] = str(part["championId"])
 					elif part["timeline"]["lane"] == "BOTTOM" and part["timeline"]["role"] == "DUO_SUPPORT":
-						if part["teamId"] == 0:
+						if part["teamId"] == 100:
 							role[8] = str(part["championId"])
 						else:
 							role[9] = str(part["championId"])
 
 				        elif part["timeline"]["lane"] == "TOP":
-						if part["teamId"] == 0:
+						if part["teamId"] == 100:
 							role[0] = str(part["championId"])
 						else:
 							role[1] = str(part["championId"])
 					elif part["timeline"]["lane"] == "JUNGLE":
-						if part["teamId"] == 0:
+						if part["teamId"] == 100:
 							role[2] = str(part["championId"])
 						else:
 							role[3] = str(part["championId"])
 					elif part["timeline"]["lane"] == "MIDDLE":
-						if part["teamId"] == 0:
+						if part["teamId"] == 100:
 							role[4] = str(part["championId"])
 						else:
 							role[5] = str(part["championId"])
@@ -60,7 +60,7 @@ def main():
 					w="1"
 				else:
 					w="0"
-				print matchID, role[0], role[1], role[2], role[3], role[4], role[5], role[6], role[7], role[8], role[9], w
+				dbfuncs.insertgame(matchID, role[0], role[1], role[2], role[3], role[4], role[5], role[6], role[7], role[8], role[9], w)
 				#dbfuncs.insertgame(matchID, top1, top2, jun1, jun2, mid1, mid2, bot1, bot2, sup1, sup2, w)
 
 
