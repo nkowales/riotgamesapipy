@@ -17,19 +17,19 @@ def main():
 	#platinumchamp = rito.getLeagues(31593648)
 	#platinum = platinumchamp["31593648"][0]
 
-	master = rito.getMaster('RANKED_SOLO_5x5')
-	#challenger = rito.getChallenger('RANKED_SOLO_5x5')
+	#master = rito.getMaster('RANKED_SOLO_5x5')
+	challenger = rito.getChallenger('RANKED_SOLO_5x5')
 
-        for entry in master["entries"]: # replace "challenger" with other league
-                matchlist = rito.getMatchList(str(entry["playerOrTeamId"]), seasons='SEASON2016,PRESEASON2017')
-                for matl in matchlist["matches"]:
-                        matchID = matl["matchId"]
+	for entry in challenger["entries"]: # replace "challenger" with other league
+		matchlist = rito.getMatchList(str(entry["playerOrTeamId"]), seasons='SEASON2016,PRESEASON2017')
+		for matl in matchlist["matches"]:
+			matchID = matl["matchId"]
 			role = [None] * 10
 			if matchID not in matches:
 				time.sleep(1)
 				matches.append(matchID)
-                        	match = rito.getMatch(matchID, timeline=True)
-	                        for part in match["participants"]:
+				match = rito.getMatch(matchID, timeline=True)
+				for part in match["participants"]:
 					if part["timeline"]["lane"] == "BOTTOM" and part["timeline"]["role"] == "DUO_CARRY":
 						if part["teamId"] == 100:
 							role[6] = str(part["championId"])
@@ -41,7 +41,7 @@ def main():
 						else:
 							role[9] = str(part["championId"])
 
-				        elif part["timeline"]["lane"] == "TOP":
+					elif part["timeline"]["lane"] == "TOP":
 						if part["teamId"] == 100:
 							role[0] = str(part["championId"])
 						else:
