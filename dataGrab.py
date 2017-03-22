@@ -8,8 +8,8 @@ def main():
 	matches=[] # list of games we got info from
 
 	# for non-challenger entries - 
-	#bronzechamp = rito.getLeagues(37517949)
-	#bronze = bronzechamp["37517949"][0]
+	#bronzechamp = rito.getLeagues(39153354)
+	#bronze = bronzechamp["39153354"][0]
 	#silverchamp = rito.getLeagues(51575588)
 	#silver = silverchamp["51575588"][0]
 	#goldchamp = rito.getLeagues(35707215)
