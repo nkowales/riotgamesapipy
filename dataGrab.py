@@ -21,7 +21,7 @@ def main():
 	challenger = rito.getChallenger('RANKED_SOLO_5x5')
 
 	for entry in challenger["entries"]: # replace "challenger" with other league
-		matchlist = rito.getMatchList(str(entry["playerOrTeamId"]), seasons='SEASON2016,PRESEASON2017')
+		matchlist = rito.getMatchList(str(entry["playerOrTeamId"]), seasons='SEASON2017,PRESEASON2017')
 		for matl in matchlist["matches"]:
 			matchID = matl["matchId"]
 			role = [None] * 10
