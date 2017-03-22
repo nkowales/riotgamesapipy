@@ -1,0 +1,100 @@
+2381351907
+MIDDLE Katarina False
+TOP Poppy False
+ADCARRY Caitlyn False
+JUNGLE Fiddlesticks False
+SUPPORT Blitzcrank False
+TOP Fiora True
+SUPPORT Brand True
+JUNGLE Amumu True
+MIDDLE Zed True
+ADCARRY Jhin True
+2367192802
+SUPPORT Janna False
+ADCARRY Tristana False
+JUNGLE Nunu False
+TOP Maokai False
+MIDDLE Syndra False
+JUNGLE Vi True
+TOP Irelia True
+SUPPORT Karma True
+ADCARRY Caitlyn True
+MIDDLE Viktor True
+2367170232
+TOP Kayle True
+MIDDLE Katarina True
+ADCARRY Ezreal True
+SUPPORT Morgana True
+JUNGLE Amumu True
+JUNGLE Hecarim False
+SUPPORT Thresh False
+TOP Renekton False
+MIDDLE Syndra False
+ADCARRY Twitch False
+2366925241
+MIDDLE Viktor True
+JUNGLE Shyvana True
+SUPPORT Blitzcrank True
+ADCARRY Quinn True
+TOP Jayce True
+TOP Riven False
+SUPPORT Maokai False
+JUNGLE Rumble False
+MIDDLE Ryze False
+ADCARRY Jinx False
+2356445482
+TOP Tryndamere False
+JUNGLE Lee Sin False
+SUPPORT Blitzcrank False
+MIDDLE Fizz False
+ADCARRY Jhin False
+ADCARRY Graves True
+TOP Aatrox True
+MIDDLE Ahri True
+JUNGLE Vi True
+SUPPORT Thresh True
+2356420990
+JUNGLE Kha'Zix True
+SUPPORT Thresh True
+MIDDLE Twisted Fate True
+TOP Gnar True
+ADCARRY Twitch True
+MIDDLE Ryze False
+ADCARRY Ezreal False
+SUPPORT Taric False
+TOP Riven False
+JUNGLE Vi False
+2356307923
+MIDDLE Syndra True
+ADCARRY Vayne True
+JUNGLE Lee Sin True
+TOP Yasuo True
+SUPPORT Leona True
+JUNGLE Vi False
+SUPPORT Veigar False
+TOP Teemo False
+MIDDLE Ryze False
+ADCARRY Caitlyn False
+2355653563
+MIDDLE Ekko True
+JUNGLE Lee Sin True
+TOP Sion True
+SUPPORT Janna True
+ADCARRY Corki True
+JUNGLE Teemo False
+ADCARRY Lucian False
+SUPPORT Blitzcrank False
+MIDDLE Twisted Fate False
+TOP Irelia False
+2355640563
+MIDDLE Viktor False
+TOP Yasuo False
+SUPPORT Veigar False
+JUNGLE Lee Sin False
+ADCARRY Vayne False
+JUNGLE Vi True
+ADCARRY Ashe True
+MIDDLE Katarina True
+TOP Maokai True
+SUPPORT Nami True
+
