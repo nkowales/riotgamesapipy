@@ -3,7 +3,10 @@ import time
 from info import API_KEY
 import dbfuncs
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 6f0c4750a7f099d75939470a16144186752e8893
 def main():
 	rito = riotgamesapipy.riotgamesapipy(API_KEY)
 	DESIREDSEASON1 = 'SEASON2017'
