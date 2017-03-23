@@ -2,9 +2,19 @@ import mysql.connector
 import info
 from id2name import NAME2ID
 from id2name import ID2NAME
+import riotgamesapipy
 
 
-
+def getmastery(summname):
+	rito = riotgamesapipy.riotgamesapipy(info.API_KEY)
+	summ = rito.getSummonerbyName(summnam)
+	summid = ''
+	for name in summ:
+		summid = name['id']
+		
+	
+	
+	
 def insertgame(i, t1, t2, j1, j2, m1, m2, b1, b2, s1, s2, w):
 
 	cnx = mysql.connector.connect(user=info.USER, password=info.PASSWORD, host=info.HOST, database=info.DATABASE, port=info.PORT)

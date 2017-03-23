@@ -22,10 +22,11 @@ def main():
 
 	#master = rito.getMaster('RANKED_SOLO_5x5')
 	challenger = rito.getChallenger('RANKED_SOLO_5x5')
-
+	attempt = 0
 	for entry in challenger["entries"]: # replace "challenger" with other league
 		matchlist = rito.getMatchList(str(entry["playerOrTeamId"]))
 		time.sleep(1)
+		attempt += 1
 		try:
 			for matl in matchlist["matches"]:
 				if ((matl['season'] == DESIREDSEASON1) or (matl['season'] == DESIREDSEASON2)):
@@ -71,9 +72,9 @@ def main():
 						#dbfuncs.insertgame(matchID, top1, top2, jun1, jun2, mid1, mid2, bot1, bot2, sup1, sup2, w)
 		except:
 			try: 
-				print 'error ' + matchlist['status']['status_code'] + ': ' +  matchlist['status']['message']
+				print 'Attempt number ' + attempt + ': Error ' + matchlist['status']['status_code'] + ': ' +  matchlist['status']['message']
 			except:
-				print 'unknown error, possibly with database, might just be duplicate entry'
+				print 'Attempt number ' + attempt + ': unknown error, possibly with database, might just be duplicate entry'
 				
 		
 if __name__ == "__main__":
