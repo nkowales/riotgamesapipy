@@ -1,6 +1,6 @@
 from Tkinter import *
 import tkMessageBox
-
+import dbfuncs
 top = Tk()
 F0 = Frame(top)
 F1 = Frame(F0)
@@ -11,7 +11,9 @@ F1.pack( side = TOP )
 F2.pack()
 F3.pack( side = BOTTOM )
 def helloCallBack():
-   tkMessageBox.showinfo( "Hello Python", "Hello World")
+	results = dbfuncs.suggestion(E2.get(), E1.get(), E3.get())
+	print results
+	tkMessageBox.showinfo( "Suggested Champions", str(results))
 
 L1 = Label(F1, text="Summoner Name")
 L1.pack( side = LEFT)
