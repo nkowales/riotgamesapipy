@@ -73,7 +73,7 @@ def main():
 			try: 
 				print 'error ' + matchlist['status']['status_code'] + ': ' +  matchlist['status']['message']
 			except:
-				print 'unknown error, possibly with database'
+				print 'unknown error, possibly with database, might just be duplicate entry'
 				
 		
 if __name__ == "__main__":
