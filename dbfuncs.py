@@ -6,15 +6,16 @@ import riotgamesapipy
 
 
 def getmastery(summname):
+	results = []
 	rito = riotgamesapipy.riotgamesapipy(info.API_KEY)
-	summ = rito.getSummonerbyName(summnam)
-	summid = ''
-	for name in summ:
-		summid = name['id']
+	summ = rito.getSummonerbyName(summname)
+	for key in summ:
+		summid = summ[key]['id']
+	masterydata = rito.getPlayerMasteries(str(summid))
+	for d in masterydata:
+		results.append(d['championId'])
+	return results
 		
-	
-	
-	
 def insertgame(i, t1, t2, j1, j2, m1, m2, b1, b2, s1, s2, w):
 
 	cnx = mysql.connector.connect(user=info.USER, password=info.PASSWORD, host=info.HOST, database=info.DATABASE, port=info.PORT)
