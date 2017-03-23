@@ -1,7 +1,7 @@
 import riotgamesapipy
 import time
 from info import API_KEY
-
+import dbfuncs
 def main():
 	rito = riotgamesapipy.riotgamesapipy(API_KEY)
 
