@@ -74,16 +74,18 @@ def findrates(position, champid):
 
 def suggestion(champname, summname, position):
 	results = {}
-	notsortedresults = []
+	nsr = []#not sorted results
 	champid = NAME2ID[champname]
 	temp = findrates(position, champid)
 	for key in temp['winrates']:
-		if ((temp['winrates'][key]) > 50 and (temp['validity'][key] == 1)):
-			notsortedrestults.append[int(key)]
+		if ((temp['winrates'][key]) > 50): #and (temp['validity'][key] == 1)):
+			nsr.append(int(key))
 	favs = getmastery(summname)
+	#print favs
+	#print temp['winrates']
 	for i in favs:
-		if i in notsortedresults:
-			results[i] = temp['winrates'][i]
+		if i in nsr:
+			results[ID2NAME[str(i)]] = temp['winrates'][str(i)]
 	return results
 	
 		

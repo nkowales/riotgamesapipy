@@ -11,9 +11,11 @@ F1.pack( side = TOP )
 F2.pack()
 F3.pack( side = BOTTOM )
 def helloCallBack():
+	#try:
 	results = dbfuncs.suggestion(E2.get(), E1.get(), E3.get())
-	print results
 	tkMessageBox.showinfo( "Suggested Champions", str(results))
+	#except:
+		#tkMessageBox.showinfo("Suggested Champions", "Error")
 
 L1 = Label(F1, text="Summoner Name")
 L1.pack( side = LEFT)
