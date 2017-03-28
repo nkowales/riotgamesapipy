@@ -1,5 +1,7 @@
 from Tkinter import *
 from id2name import NAME2ID
+from id2name import ID2NAME
+from nicknames2names import NICKNAMES2NAMES
 import tkMessageBox
 import dbfuncs
 pos = ['supp', 'bot', 'mid', 'jungle', 'top']
@@ -16,7 +18,14 @@ F3.pack( side = BOTTOM )
 def helloCallBack():
 	try:
 		if E2.get() not in NAME2ID:
-			raise Exception('invalid champion name')
+			if E2.get() in ID2NAME:
+				tempname = ID2NAME[E2.get()]
+			elif E2.get().lower() in NICKNAMES2NAMES:
+				tempname = NICKNAMES2NAMES[E2.get().lower()]
+			else:
+				raise Exception('invalid champion name')
+		else:
+			tempname = E2.get()
 		if E3.get().lower() not in pos:
 			if E3.get().lower() not in posnn:
 				raise Exception('invalid position')
@@ -24,7 +33,7 @@ def helloCallBack():
 				postemp = posnn[E3.get().lower()]
 		else:
 			postemp = E3.get().lower()
-		results = dbfuncs.suggestion(E2.get(), E1.get(), postemp)
+		results = dbfuncs.suggestion(tempname, E1.get(), postemp)
 		tkMessageBox.showinfo( "Suggested Champions", str(results))
 		
 	except Exception as e:
