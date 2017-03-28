@@ -71,11 +71,11 @@ def main():
 				
 							dbfuncs.insertgame(matchID, role[0], role[1], role[2], role[3], role[4], role[5], role[6], role[7], role[8], role[9], w)
 							#dbfuncs.insertgame(matchID, top1, top2, jun1, jun2, mid1, mid2, bot1, bot2, sup1, sup2, w)
-				except:
+				except Exception as e:
 					try: 
 						print 'Attempt number ' + str(attempt) + ': Error ' + matchlist['status']['status_code'] + ': ' +  matchlist['status']['message']
 					except:
-						print 'Attempt number ' + str(attempt) + ': unknown error, possibly with database, might just be duplicate entry'
+						print 'Attempt number ' + str(attempt) + ': ' + str(e)
 				
 		else:
 			print 'No matches found'
