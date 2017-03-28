@@ -2,6 +2,8 @@ import riotgamesapipy
 from info import API_KEY
 import time
 
+#create dictionaries of champion names to champion ids and champion ids to champion names
+
 rito = riotgamesapipy.riotgamesapipy(API_KEY)
 f = open('id2name.py', 'w')
 st = 'NAME2ID = {'

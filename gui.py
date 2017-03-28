@@ -4,8 +4,9 @@ from id2name import ID2NAME
 from nicknames2names import NICKNAMES2NAMES
 import tkMessageBox
 import dbfuncs
-pos = ['supp', 'bot', 'mid', 'jungle', 'top']
-posnn = {'support' : 'supp', 'sup' : 'supp', 'adc' : 'bot', 'bottom' : 'bot', 'middle' : 'mid', 'solomid' : 'mid', 'jung' : 'jungle', 'jun' : 'jungle', 'j' : 'jungle'}
+
+pos = ['supp', 'bot', 'mid', 'jungle', 'top']#valid position entries
+posnn = {'support' : 'supp', 'sup' : 'supp', 'adc' : 'bot', 'bottom' : 'bot', 'middle' : 'mid', 'solomid' : 'mid', 'jung' : 'jungle', 'jun' : 'jungle', 'j' : 'jungle'}#common alternate position names
 top = Tk()
 F0 = Frame(top)
 F1 = Frame(F0)
@@ -15,6 +16,8 @@ F0.pack(side = TOP)
 F1.pack( side = TOP )
 F2.pack()
 F3.pack( side = BOTTOM )
+
+#call back function for button
 def helloCallBack():
 	try:
 		if E2.get() not in NAME2ID:
