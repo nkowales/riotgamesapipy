@@ -29,6 +29,22 @@ def insertgame(i, t1, t2, j1, j2, m1, m2, b1, b2, s1, s2, w):
 	cursor.close()
 	cnx.close()
 
+def findbest(position, champid):
+	mylist = []
+	cnx = mysql.connector.connect(user=info.USER, password=info.PASSWORD, host=info.HOST, database=info.DATABASE, port=info.PORT)
+	cursor = cnx.cursor()
+	#query = ('SELECT COUNT(*) FROM games WHERE ( ' + position + '1 = ' + champid + ' AND ' + position + '2 = ' + enemyid + ' AND win = 1 ) OR ( ' + position + '2 = ' + champid + ' AND ' + position + '1 = ' + enemyid + ' AND win = 0 )')
+	query = ('SELECT ' + position + '2, avg(win) AS wr FROM ( ( SELECT gameid, ' + position + '1, ' + position + '2, win FROM games WHERE ' + position + '1 = ' + champid + ' ) UNION ALL ( SELECT gameid, ' + position + '1 AS ' + position + '2, ' + position + '2 AS ' + position + '1, IF( win = 0, 1, 0 ) AS win FROM games WHERE ' + position + '2 = ' + champid + ' ) ) AS z GROUP BY ' + position + '2 HAVING ( COUNT(*) > 29 AND wr > .5 )')
+	cursor.execute(query)
+	
+	for r in cursor:
+		mylist.append(r)
+	
+	cursor.close()
+	cnx.close()
+	return mylist
+
+
 #given a position, and 2 champion ids return the number of wins the first champion has against the second
 def findwin(position, champid, enemyid):#position same as role, lane assignment. should be top, jungle, mid, bot, or supp
 	cnx = mysql.connector.connect(user=info.USER, password=info.PASSWORD, host=info.HOST, database=info.DATABASE, port=info.PORT)
