@@ -22,7 +22,7 @@ def getmastery(summname):
 def insertgame(i, t1, t2, j1, j2, m1, m2, b1, b2, s1, s2, w, r):
 	cnx = mysql.connector.connect(user=info.USER, password=info.PASSWORD, host=info.HOST, database=info.DATABASE, port=info.PORT)
 	cursor = cnx.cursor()
-	add_game = ("INSERT INTO games (gameid, top1, top2, jungle1, jungle2, mid1, mid2, bot1, bot2, supp1, supp2, win) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)")
+	add_game = ("INSERT INTO games (gameid, top1, top2, jungle1, jungle2, mid1, mid2, bot1, bot2, supp1, supp2, win, rank) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)")
 	game_data = (i, t1, t2, j1, j2, m1, m2, b1, b2, s1, s2, w, r)
 	cursor.execute(add_game, game_data)
 	cnx.commit()
