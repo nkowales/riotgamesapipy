@@ -19,11 +19,11 @@ def getmastery(summname):
 	return results
 		
 #given game id, the champion id's for each position, and a 1 or 0 indicating who won, insert data into database
-def insertgame(i, t1, t2, j1, j2, m1, m2, b1, b2, s1, s2, w):
+def insertgame(i, t1, t2, j1, j2, m1, m2, b1, b2, s1, s2, w, r):
 	cnx = mysql.connector.connect(user=info.USER, password=info.PASSWORD, host=info.HOST, database=info.DATABASE, port=info.PORT)
 	cursor = cnx.cursor()
-	add_game = ("INSERT INTO games (gameid, top1, top2, jungle1, jungle2, mid1, mid2, bot1, bot2, supp1, supp2, win) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)")
-	game_data = (i, t1, t2, j1, j2, m1, m2, b1, b2, s1, s2, w)
+	add_game = ("INSERT INTO games (gameid, top1, top2, jungle1, jungle2, mid1, mid2, bot1, bot2, supp1, supp2, win) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)")
+	game_data = (i, t1, t2, j1, j2, m1, m2, b1, b2, s1, s2, w, r)
 	cursor.execute(add_game, game_data)
 	cnx.commit()
 	cursor.close()
@@ -94,19 +94,16 @@ def findrates(position, champid):
 
 #given a champion name, a summoner name, and a position gives suggestions on counter matchup for that summoner
 def suggestion(champname, summname, position):
-	results = {}
-	nsr = []#not sorted results
+	#results = {}
+	#nsr = []#not sorted results
 	champid = NAME2ID[champname]
-	temp = findrates(position, champid)
-	for key in temp['winrates']:
-		if ((temp['winrates'][key]) > 50): #and (temp['validity'][key] == 1)):
-			nsr.append(int(key))
+	temp = findbest(position, champid)
 	favs = getmastery(summname)
-	#print favs
-	#print temp['winrates']
-	for i in favs:
-		if i in nsr:
-			results[ID2NAME[str(i)]] = temp['winrates'][str(i)]
-	return results
+	print favs
+	print temp
+	#for i in favs:
+	#	if i in nsr:
+	#		results[ID2NAME[str(i)]] = temp['winrates'][str(i)]
+	#return results
 	
 		
