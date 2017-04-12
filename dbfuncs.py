@@ -15,7 +15,7 @@ def getmastery(summname):
 	masterydata = rito.getPlayerMasteries(str(summid))
 	for d in masterydata:
 		results.append(d['championId'])
-	print results
+	#print results
 	return results
 		
 #given game id, the champion id's for each position, and a 1 or 0 indicating who won, insert data into database
@@ -34,7 +34,8 @@ def findbest(position, champid):
 	cnx = mysql.connector.connect(user=info.USER, password=info.PASSWORD, host=info.HOST, database=info.DATABASE, port=info.PORT)
 	cursor = cnx.cursor()
 	#query = ('SELECT COUNT(*) FROM games WHERE ( ' + position + '1 = ' + champid + ' AND ' + position + '2 = ' + enemyid + ' AND win = 1 ) OR ( ' + position + '2 = ' + champid + ' AND ' + position + '1 = ' + enemyid + ' AND win = 0 )')
-	query = ('SELECT ' + position + '2, avg(win) AS wr FROM ( ( SELECT gameid, ' + position + '1, ' + position + '2, win FROM games WHERE ' + position + '1 = ' + champid + ' ) UNION ALL ( SELECT gameid, ' + position + '1 AS ' + position + '2, ' + position + '2 AS ' + position + '1, IF( win = 0, 1, 0 ) AS win FROM games WHERE ' + position + '2 = ' + champid + ' ) ) AS z GROUP BY ' + position + '2 HAVING ( COUNT(*) > 29 AND wr > .5 )')
+	#SELECT pos2, AVG(w) as wr FROM ( ( SELECT gameid, top2 AS pos1, top1 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE top2 = 154 ) UNION ALL ( SELECT gameid, top1 AS pos1, top2 AS pos2, win AS w FROM games WHERE top1 = 154 ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 AND wr > .5 ORDER BY wr DESC;
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, ' + position + '2 AS pos1, ' + position + '1 AS pos2, IF( win = 0, 1, 0) AS w FROM games WHERE ' + position + '2 = ' + champid + ' ) UNION ALL ( SELECT gameid, ' + position + '1 AS pos1, ' + position + '2 AS pos2, win AS w FROM games WHERE ' + position + '1 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 AND wr > .5 ORDER BY wr DESC')
 	cursor.execute(query)
 	
 	for (i, w) in cursor:
@@ -94,16 +95,14 @@ def findrates(position, champid):
 
 #given a champion name, a summoner name, and a position gives suggestions on counter matchup for that summoner
 def suggestion(champname, summname, position):
-	#results = {}
+	results = {}
 	#nsr = []#not sorted results
 	champid = NAME2ID[champname]
 	temp = findbest(position, champid)
 	favs = getmastery(summname)
-	print favs
-	print temp
-	#for i in favs:
-	#	if i in nsr:
-	#		results[ID2NAME[str(i)]] = temp['winrates'][str(i)]
-	#return results
+	for i in favs:
+		if i in temp:
+			results[ID2NAME[str(i)]] = temp[i]
+	return results
 	
 		
