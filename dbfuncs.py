@@ -14,7 +14,7 @@ def getmastery(summname):
 		summid = summ[key]['id']
 	masterydata = rito.getPlayerMasteries(str(summid))
 	for d in masterydata:
-		results.append(d['championId'])
+		results.append((d['championId'], d["championPoints"]))
 	#print results
 	return results
 		
@@ -95,14 +95,15 @@ def findrates(position, champid):
 
 #given a champion name, a summoner name, and a position gives suggestions on counter matchup for that summoner
 def suggestion(champname, summname, position):
-	results = {}
+	results = []
 	#nsr = []#not sorted results
 	champid = NAME2ID[champname]
 	temp = findbest(position, champid)
 	favs = getmastery(summname)
 	for i in favs:
-		if i in temp:
-			results[ID2NAME[str(i)]] = temp[i]
+		if i[0] in temp:
+			results.append((ID2NAME[str(i[0])], i[1], temp[i[0]]))
+			results.sort(key=lambda tup: tup[1], reverse=True)
 	return results
 	
 		
