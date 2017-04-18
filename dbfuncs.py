@@ -29,13 +29,14 @@ def insertgame(i, t1, t2, j1, j2, m1, m2, b1, b2, s1, s2, w, r):
 	cursor.close()
 	cnx.close()
 
+#given position and champion give winning matchups
 def findbest(position, champid):
 	myd = {}
 	cnx = mysql.connector.connect(user=info.USER, password=info.PASSWORD, host=info.HOST, database=info.DATABASE, port=info.PORT)
 	cursor = cnx.cursor()
 	#query = ('SELECT COUNT(*) FROM games WHERE ( ' + position + '1 = ' + champid + ' AND ' + position + '2 = ' + enemyid + ' AND win = 1 ) OR ( ' + position + '2 = ' + champid + ' AND ' + position + '1 = ' + enemyid + ' AND win = 0 )')
 	#SELECT pos2, AVG(w) as wr FROM ( ( SELECT gameid, top2 AS pos1, top1 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE top2 = 154 ) UNION ALL ( SELECT gameid, top1 AS pos1, top2 AS pos2, win AS w FROM games WHERE top1 = 154 ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 AND wr > .5 ORDER BY wr DESC;
-	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, ' + position + '2 AS pos1, ' + position + '1 AS pos2, IF( win = 0, 1, 0) AS w FROM games WHERE ' + position + '2 = ' + champid + ' ) UNION ALL ( SELECT gameid, ' + position + '1 AS pos1, ' + position + '2 AS pos2, win AS w FROM games WHERE ' + position + '1 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 AND wr > .5 ORDER BY wr DESC')
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, ' + position + '2 AS pos1, ' + position + '1 AS pos2, win AS w FROM games WHERE ' + position + '2 = ' + champid + ' ) UNION ALL ( SELECT gameid, ' + position + '1 AS pos1, ' + position + '2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE ' + position + '1 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 AND wr > .5 ORDER BY wr DESC')
 	cursor.execute(query)
 	
 	for (i, w) in cursor:
@@ -45,6 +46,21 @@ def findbest(position, champid):
 	cnx.close()
 	return myd
 
+#given position and champion id give top matchups
+def findbestavailable(position, champid):
+	myd = []
+	cnx = mysql.connector.connect(user=info.USER, password=info.PASSWORD, host=info.HOST, database=info.DATABASE, port=info.PORT)
+	cursor = cnx.cursor()
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, ' + position + '2 AS pos1, ' + position + '1 AS pos2, win AS w FROM games WHERE ' + position + '2 = ' + champid + ' ) UNION ALL ( SELECT gameid, ' + position + '1 AS pos1, ' + position + '2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE ' + position + '1 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 ORDER BY wr DESC LIMIT 20')
+	cursor.execute(query)
+	
+	for (i, w) in cursor:
+		myd.append((ID2NAME[str(i)],w))
+	
+	cursor.close()
+	cnx.close()
+	return myd
+	
 
 #given a position, and 2 champion ids return the number of wins the first champion has against the second
 def findwin(position, champid, enemyid):#position same as role, lane assignment. should be top, jungle, mid, bot, or supp
@@ -106,4 +122,56 @@ def suggestion(champname, summname, position):
 			results.sort(key=lambda tup: tup[1], reverse=True)
 	return results
 	
-		
+	
+#given championgive good matchups.
+def findlook(champname, position):
+	champid = NAME2ID[champname]
+	myd = []
+	cnx = mysql.connector.connect(user=info.USER, password=info.PASSWORD, host=info.HOST, database=info.DATABASE, port=info.PORT)
+	cursor = cnx.cursor()
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, ' + position + '2 AS pos1, ' + position + '1 AS pos2, win AS w FROM games WHERE ' + position + '2 = ' + champid + ' ) UNION ALL ( SELECT gameid, ' + position + '1 AS pos1, ' + position + '2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE ' + position + '1 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 ORDER BY wr ASC LIMIT 20')
+	cursor.execute(query)
+	
+	for (i, w) in cursor:
+		myd.append((ID2NAME[str(i)],w))
+	
+	cursor.close()
+	cnx.close()
+	return myd
+
+#given enemy bot laner suggest support pick
+def findsvb(sname, champname):
+	results = []
+	champid = NAME2ID[champname]
+	
+	myd = {}
+	cnx = mysql.connector.connect(user=info.USER, password=info.PASSWORD, host=info.HOST, database=info.DATABASE, port=info.PORT)
+	cursor = cnx.cursor()
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, bot2 AS pos1, supp1 AS pos2, win AS w FROM games WHERE bot2 = ' + champid + ' ) UNION ALL ( SELECT gameid, bot1 AS pos1, supp2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE bot1 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 AND wr > .5 ORDER BY wr DESC')
+	cursor.execute(query)
+	for (i, w) in cursor:
+		myd[int(i)] = float(w)
+	cursor.close()
+	cnx.close()
+	
+	favs = getmastery(sname)
+	for i in favs:
+		if i[0] in myd:
+			results.append((ID2NAME[str(i[0])], i[1], myd[i[0]]))
+			results.sort(key=lambda tup: tup[1], reverse=True)
+	return results
+
+#given enemy bot laner suggest support pick
+def findsvbavailable(champname):
+	results = []
+	champid = NAME2ID[champname]
+	myl = []
+	cnx = mysql.connector.connect(user=info.USER, password=info.PASSWORD, host=info.HOST, database=info.DATABASE, port=info.PORT)
+	cursor = cnx.cursor()
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, bot2 AS pos1, supp1 AS pos2, win AS w FROM games WHERE bot2 = ' + champid + ' ) UNION ALL ( SELECT gameid, bot1 AS pos1, supp2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE bot1 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 ORDER BY wr DESC LIMIT 20')
+	cursor.execute(query)
+	for (i, w) in cursor:
+		myl.append((ID2NAME[str(i)],w))
+	cursor.close()
+	cnx.close()
+	return myl

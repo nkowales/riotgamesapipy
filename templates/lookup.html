@@ -23,12 +23,10 @@
       </div>
  
       <div class="jumbotron">
-        <h1>Pick Suggestion From Champion Win Rates Against Lane Opponent's Champion</h1>
-        <form class="form-signin" action="/apptest" method="post">
-        <label for="inputName" class="sr-only">Summoner Name</label>
-        <input type="name" name="inputName" id="inputName" class="form-control" placeholder="Summoner Name" required autofocus>
-        <label for="inputChamp" class="sr-only">Enemy Champion</label>
-        <input type="champ" name="inputChamp" id="inputChamp" class="form-control" placeholder="Enemy Champion" required autofocus>
+        <h1>Find Best Lane Matchups</h1>
+       <form class="form-signin" action="/lookupresults" method="post">
+		<label for="inputChamp" class="sr-only">Enemy Champion</label>
+        <input type="champ" name="inputChamp" id="inputChamp" class="form-control" placeholder="Champion" required autofocus>
         <label for="inputPos" class="sr-only">Password</label>
         <input type="position" name="inputPos" id="inputPos" class="form-control" placeholder="Position" required>
         <input type="submit" value="Go"></input>
