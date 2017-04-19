@@ -1,13 +1,443 @@
 from flask import Flask, render_template, json, request, redirect
+from flask.ext.mysql import MySQL
 from id2name import NAME2ID
 from id2name import ID2NAME
 from nicknames2names import NICKNAMES2NAMES
-import dbfuncs
+import info
+import riotgamesapipy
 
 pos = ['supp', 'bot', 'mid', 'jungle', 'top']#valid position entries
 posnn = {'support' : 'supp', 'sup' : 'supp', 'adc' : 'bot', 'bottom' : 'bot', 'middle' : 'mid', 'solomid' : 'mid', 'jung' : 'jungle', 'jun' : 'jungle', 'j' : 'jungle'}#common alternate position names
 
+
 application = Flask(__name__)
+mysql = MySQL()
+
+ 
+# MySQL configurations
+application.config['MYSQL_DATABASE_USER'] = info.USER
+application.config['MYSQL_DATABASE_PASSWORD'] = info.PASSWORD
+application.config['MYSQL_DATABASE_DB'] = info.DATABASE
+application.config['MYSQL_DATABASE_HOST'] = info.HOST
+mysql.init_app(application)
+
+
+
+#given summoner name return list of champions sorted by that summoner's champion mastery
+def getmastery(summname):
+	results = []
+	rito = riotgamesapipy.riotgamesapipy(info.API_KEY)
+	summ = rito.getSummonerbyName(summname)
+	for key in summ:
+		summid = summ[key]['id']
+	masterydata = rito.getPlayerMasteries(str(summid))
+	for d in masterydata:
+		results.append((d['championId'], d["championPoints"]))
+	#print results
+	return results
+
+#given position and champion give winning matchups
+def findbest(position, champid):
+	myd = {}
+	cnx = mysql.connect()
+	cursor = cnx.cursor()
+	#query = ('SELECT COUNT(*) FROM games WHERE ( ' + position + '1 = ' + champid + ' AND ' + position + '2 = ' + enemyid + ' AND win = 1 ) OR ( ' + position + '2 = ' + champid + ' AND ' + position + '1 = ' + enemyid + ' AND win = 0 )')
+	#SELECT pos2, AVG(w) as wr FROM ( ( SELECT gameid, top2 AS pos1, top1 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE top2 = 154 ) UNION ALL ( SELECT gameid, top1 AS pos1, top2 AS pos2, win AS w FROM games WHERE top1 = 154 ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 AND wr > .5 ORDER BY wr DESC;
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, ' + position + '2 AS pos1, ' + position + '1 AS pos2, win AS w FROM games WHERE ' + position + '2 = ' + champid + ' ) UNION ALL ( SELECT gameid, ' + position + '1 AS pos1, ' + position + '2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE ' + position + '1 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 AND wr > .5 ORDER BY wr DESC')
+	cursor.execute(query)
+	
+	for (i, w) in cursor:
+		myd[int(i)] = float(w)
+	
+	cursor.close()
+	cnx.close()
+	return myd
+
+#given position and champion id give top matchups
+def findbestavailable(position, champid):
+	myd = []
+	cnx = mysql.connect()
+	cursor = cnx.cursor()
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, ' + position + '2 AS pos1, ' + position + '1 AS pos2, win AS w FROM games WHERE ' + position + '2 = ' + champid + ' ) UNION ALL ( SELECT gameid, ' + position + '1 AS pos1, ' + position + '2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE ' + position + '1 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 ORDER BY wr DESC LIMIT 20')
+	cursor.execute(query)
+	
+	for (i, w) in cursor:
+		myd.append((ID2NAME[str(i)],w))
+	
+	cursor.close()
+	cnx.close()
+	return myd
+
+#given a champion name, a summoner name, and a position gives suggestions on counter matchup for that summoner
+def suggestion(champname, summname, position):
+	results = []
+	#nsr = []#not sorted results
+	champid = NAME2ID[champname]
+	temp = findbest(position, champid)
+	favs = getmastery(summname)
+	for i in favs:
+		if i[0] in temp:
+			results.append((ID2NAME[str(i[0])], i[1], temp[i[0]]))
+			results.sort(key=lambda tup: tup[1], reverse=True)
+	return results
+	
+	
+#given championgive good matchups.
+def findlook(champname, position):
+	champid = NAME2ID[champname]
+	myd = []
+	cnx = mysql.connect()
+	cursor = cnx.cursor()
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, ' + position + '2 AS pos1, ' + position + '1 AS pos2, win AS w FROM games WHERE ' + position + '2 = ' + champid + ' ) UNION ALL ( SELECT gameid, ' + position + '1 AS pos1, ' + position + '2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE ' + position + '1 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 ORDER BY wr ASC LIMIT 20')
+	cursor.execute(query)
+	
+	for (i, w) in cursor:
+		myd.append((ID2NAME[str(i)],w))
+	
+	cursor.close()
+	cnx.close()
+	return myd
+
+#given enemy bot laner suggest support pick
+def findsvb(sname, champname):
+	results = []
+	champid = NAME2ID[champname]
+	
+	myd = {}
+	cnx = mysql.connect()
+	cursor = cnx.cursor()
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, bot2 AS pos1, supp1 AS pos2, win AS w FROM games WHERE bot2 = ' + champid + ' ) UNION ALL ( SELECT gameid, bot1 AS pos1, supp2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE bot1 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 AND wr > .5 ORDER BY wr DESC')
+	cursor.execute(query)
+	for (i, w) in cursor:
+		myd[int(i)] = float(w)
+	cursor.close()
+	cnx.close()
+	
+	favs = getmastery(sname)
+	for i in favs:
+		if i[0] in myd:
+			results.append((ID2NAME[str(i[0])], i[1], myd[i[0]]))
+			results.sort(key=lambda tup: tup[1], reverse=True)
+	return results
+
+#given enemy bot laner suggest support pick
+def findsvbavailable(champname):
+	results = []
+	champid = NAME2ID[champname]
+	myl = []
+	cnx = mysql.connect()
+	cursor = cnx.cursor()
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, bot2 AS pos1, supp1 AS pos2, win AS w FROM games WHERE bot2 = ' + champid + ' ) UNION ALL ( SELECT gameid, bot1 AS pos1, supp2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE bot1 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 ORDER BY wr DESC LIMIT 20')
+	cursor.execute(query)
+	for (i, w) in cursor:
+		myl.append((ID2NAME[str(i)],w))
+	cursor.close()
+	cnx.close()
+	return myl
+
+#given enemy support suggest bot lane pick
+def findbvs(sname, champname):
+	results = []
+	champid = NAME2ID[champname]
+	myd = {}
+	cnx = mysql.connect()
+	cursor = cnx.cursor()
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, supp2 AS pos1, bot1 AS pos2, win AS w FROM games WHERE supp2 = ' + champid + ' ) UNION ALL ( SELECT gameid, supp1 AS pos1, bot2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE supp1 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 AND wr > .5 ORDER BY wr DESC')
+	cursor.execute(query)
+	for (i, w) in cursor:
+		myd[int(i)] = float(w)
+	cursor.close()
+	cnx.close()
+	
+	favs = getmastery(sname)
+	for i in favs:
+		if i[0] in myd:
+			results.append((ID2NAME[str(i[0])], i[1], myd[i[0]]))
+			results.sort(key=lambda tup: tup[1], reverse=True)
+	return results
+
+#given enemy support suggest bot lane pick
+def findbvsavailable(champname):
+	results = []
+	champid = NAME2ID[champname]
+	myl = []
+	cnx = mysql.connect()
+	cursor = cnx.cursor()
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, supp2 AS pos1, bot1 AS pos2, win AS w FROM games WHERE supp2 = ' + champid + ' ) UNION ALL ( SELECT gameid, supp1 AS pos1, bot2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE supp1 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 ORDER BY wr DESC LIMIT 20')
+	cursor.execute(query)
+	for (i, w) in cursor:
+		myl.append((ID2NAME[str(i)],w))
+	cursor.close()
+	cnx.close()
+	return myl
+
+#given your support suggest bot lane pick
+def findbws(sname, champname):
+	results = []
+	champid = NAME2ID[champname]
+	myd = {}
+	cnx = mysql.connect()
+	cursor = cnx.cursor()
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, supp1 AS pos1, bot1 AS pos2, win AS w FROM games WHERE supp1 = ' + champid + ' ) UNION ALL ( SELECT gameid, supp2 AS pos1, bot2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE supp2 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 AND wr > .5 ORDER BY wr DESC')
+	cursor.execute(query)
+	for (i, w) in cursor:
+		myd[int(i)] = float(w)
+	cursor.close()
+	cnx.close()
+	
+	favs = getmastery(sname)
+	for i in favs:
+		if i[0] in myd:
+			results.append((ID2NAME[str(i[0])], i[1], myd[i[0]]))
+			results.sort(key=lambda tup: tup[1], reverse=True)
+	return results
+
+#given your support suggest bot lane pick
+def findbwsavailable(champname):
+	results = []
+	champid = NAME2ID[champname]
+	myl = []
+	cnx = mysql.connect()
+	cursor = cnx.cursor()
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, supp1 AS pos1, bot1 AS pos2, win AS w FROM games WHERE supp1 = ' + champid + ' ) UNION ALL ( SELECT gameid, supp2 AS pos1, bot2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE supp2 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 ORDER BY wr DESC LIMIT 20')
+	cursor.execute(query)
+	for (i, w) in cursor:
+		myl.append((ID2NAME[str(i)],w))
+	cursor.close()
+	cnx.close()
+	return myl
+
+#given your support suggest bot lane pick
+def findswb(sname, champname):
+	results = []
+	champid = NAME2ID[champname]
+	myd = {}
+	cnx = mysql.connect()
+	cursor = cnx.cursor()
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, bot1 AS pos1, supp1 AS pos2, win AS w FROM games WHERE bot1 = ' + champid + ' ) UNION ALL ( SELECT gameid, bot2 AS pos1, supp2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE bot2 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 AND wr > .5 ORDER BY wr DESC')
+	cursor.execute(query)
+	for (i, w) in cursor:
+		myd[int(i)] = float(w)
+	cursor.close()
+	cnx.close()
+	
+	favs = getmastery(sname)
+	for i in favs:
+		if i[0] in myd:
+			results.append((ID2NAME[str(i[0])], i[1], myd[i[0]]))
+			results.sort(key=lambda tup: tup[1], reverse=True)
+	return results
+
+#given your support suggest bot lane pick
+def findswbavailable(champname):
+	results = []
+	champid = NAME2ID[champname]
+	myl = []
+	cnx = mysql.connect()
+	cursor = cnx.cursor()
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, bot1 AS pos1, supp1 AS pos2, win AS w FROM games WHERE bot1 = ' + champid + ' ) UNION ALL ( SELECT gameid, bot2 AS pos1, supp2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE bot2 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 ORDER BY wr DESC LIMIT 20')
+	cursor.execute(query)
+	for (i, w) in cursor:
+		myl.append((ID2NAME[str(i)],w))
+	cursor.close()
+	cnx.close()
+	return myl
+
+#given your middle suggest jungle pick
+def findjwm(sname, champname):
+	results = []
+	champid = NAME2ID[champname]
+	myd = {}
+	cnx = mysql.connect()
+	cursor = cnx.cursor()
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, mid1 AS pos1, jungle1 AS pos2, win AS w FROM games WHERE mid1 = ' + champid + ' ) UNION ALL ( SELECT gameid, mid2 AS pos1, jungle2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE mid2 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 AND wr > .5 ORDER BY wr DESC')
+	cursor.execute(query)
+	for (i, w) in cursor:
+		myd[int(i)] = float(w)
+	cursor.close()
+	cnx.close()
+	
+	favs = getmastery(sname)
+	for i in favs:
+		if i[0] in myd:
+			results.append((ID2NAME[str(i[0])], i[1], myd[i[0]]))
+			results.sort(key=lambda tup: tup[1], reverse=True)
+	return results
+
+#given your middle suggest jungle pick
+def findjwmavailable(champname):
+	results = []
+	champid = NAME2ID[champname]
+	myl = []
+	cnx = mysql.connect()
+	cursor = cnx.cursor()
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, mid1 AS pos1, jungle1 AS pos2, win AS w FROM games WHERE mid1 = ' + champid + ' ) UNION ALL ( SELECT gameid, mid2 AS pos1, jungle2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE mid2 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 ORDER BY wr DESC LIMIT 20')
+	cursor.execute(query)
+	for (i, w) in cursor:
+		myl.append((ID2NAME[str(i)],w))
+	cursor.close()
+	cnx.close()
+	return myl
+
+#given your jungle suggest mid pick
+def findmwj(sname, champname):
+	results = []
+	champid = NAME2ID[champname]
+	myd = {}
+	cnx = mysql.connect()
+	cursor = cnx.cursor()
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, jungle1 AS pos1, mid1 AS pos2, win AS w FROM games WHERE jungle1 = ' + champid + ' ) UNION ALL ( SELECT gameid, jungle2 AS pos1, mid2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE jungle2 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 AND wr > .5 ORDER BY wr DESC')
+	cursor.execute(query)
+	for (i, w) in cursor:
+		myd[int(i)] = float(w)
+	cursor.close()
+	cnx.close()
+	
+	favs = getmastery(sname)
+	for i in favs:
+		if i[0] in myd:
+			results.append((ID2NAME[str(i[0])], i[1], myd[i[0]]))
+			results.sort(key=lambda tup: tup[1], reverse=True)
+	return results
+
+#given your jungle suggest mid pick
+def findmwjavailable(champname):
+	results = []
+	champid = NAME2ID[champname]
+	myl = []
+	cnx = mysql.connect()
+	cursor = cnx.cursor()
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, jungle1 AS pos1, mid1 AS pos2, win AS w FROM games WHERE jungle1 = ' + champid + ' ) UNION ALL ( SELECT gameid, jungle2 AS pos1, mid2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE jungle2 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 ORDER BY wr DESC LIMIT 20')
+	cursor.execute(query)
+	for (i, w) in cursor:
+		myl.append((ID2NAME[str(i)],w))
+	cursor.close()
+	cnx.close()
+	return myl
+
+#given your top suggest jungle pick
+def findjwt(sname, champname):
+	results = []
+	champid = NAME2ID[champname]
+	myd = {}
+	cnx = mysql.connect()
+	cursor = cnx.cursor()
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, top1 AS pos1, jungle1 AS pos2, win AS w FROM games WHERE top1 = ' + champid + ' ) UNION ALL ( SELECT gameid, top2 AS pos1, jungle2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE top2 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 AND wr > .5 ORDER BY wr DESC')
+	cursor.execute(query)
+	for (i, w) in cursor:
+		myd[int(i)] = float(w)
+	cursor.close()
+	cnx.close()
+	
+	favs = getmastery(sname)
+	for i in favs:
+		if i[0] in myd:
+			results.append((ID2NAME[str(i[0])], i[1], myd[i[0]]))
+			results.sort(key=lambda tup: tup[1], reverse=True)
+	return results
+
+#given your jungle suggest top pick
+def findtwj(sname, champname):
+	results = []
+	champid = NAME2ID[champname]
+	myd = {}
+	cnx = mysql.connect()
+	cursor = cnx.cursor()
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, jungle1 AS pos1, top1 AS pos2, win AS w FROM games WHERE jungle1 = ' + champid + ' ) UNION ALL ( SELECT gameid, jungle2 AS pos1, top2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE jungle2 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 AND wr > .5 ORDER BY wr DESC')
+	cursor.execute(query)
+	for (i, w) in cursor:
+		myd[int(i)] = float(w)
+	cursor.close()
+	cnx.close()
+	
+	favs = getmastery(sname)
+	for i in favs:
+		if i[0] in myd:
+			results.append((ID2NAME[str(i[0])], i[1], myd[i[0]]))
+			results.sort(key=lambda tup: tup[1], reverse=True)
+	return results
+
+#given your jungle suggest top pick
+def findtwjavailable(champname):
+	results = []
+	champid = NAME2ID[champname]
+	myl = []
+	cnx = mysql.connect()
+	cursor = cnx.cursor()
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, jungle1 AS pos1, top1 AS pos2, win AS w FROM games WHERE jungle1 = ' + champid + ' ) UNION ALL ( SELECT gameid, jungle2 AS pos1, top2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE jungle2 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 ORDER BY wr DESC LIMIT 20')
+	cursor.execute(query)
+	for (i, w) in cursor:
+		myl.append((ID2NAME[str(i)],w))
+	cursor.close()
+	cnx.close()
+	return myl
+
+#given your top suggest jungle pick
+def findjwtavailable(champname):
+	results = []
+	champid = NAME2ID[champname]
+	myl = []
+	cnx = mysql.connector.connect(user=info.USER, password=info.PASSWORD, host=info.HOST, database=info.DATABASE, port=info.PORT)
+	cursor = cnx.cursor()
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, top1 AS pos1, jungle1 AS pos2, win AS w FROM games WHERE top1 = ' + champid + ' ) UNION ALL ( SELECT gameid, top2 AS pos1, jungle2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE top2 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 ORDER BY wr DESC LIMIT 20')
+	cursor.execute(query)
+	for (i, w) in cursor:
+		myl.append((ID2NAME[str(i)],w))
+	cursor.close()
+	cnx.close()
+	return myl
+
+#basic blind pick suggestions by win rate
+def findbasicblind(sname, position):
+	results = []
+	myd = {}
+	cnx = mysql.connect()
+	cursor = cnx.cursor()
+	query = ('SELECT pos, AVG(w) AS wr FROM ( ( SELECT ' + position + '1 AS pos, win AS w FROM games ) UNION ALL ( SELECT ' + position + '2 AS pos, IF( win = 0, 1, 0 ) AS w FROM games ) ) AS z GROUP BY pos HAVING COUNT(*) > 30 AND wr > .5 ORDER BY wr DESC')
+	cursor.execute(query)
+	for (i, w) in cursor:
+		myd[int(i)] = float(w)
+	cursor.close()
+	cnx.close()
+	
+	favs = getmastery(sname)
+	for i in favs:
+		if i[0] in myd:
+			results.append((ID2NAME[str(i[0])], i[1], myd[i[0]]))
+			results.sort(key=lambda tup: tup[1], reverse=True)
+	return results
+
+#basic blind pick suggestions by win rate
+def findbasicblindavailable(champname):
+	results = []
+	champid = NAME2ID[champname]
+	myl = []
+	cnx = mysql.connect()
+	cursor = cnx.cursor()
+	query = ('SELECT pos, AVG(w) AS wr FROM ( ( SELECT ' + position + '1 AS pos, win AS w FROM games ) UNION ALL ( SELECT ' + position + '2 AS pos, IF( win = 0, 1, 0 ) AS w FROM games ) ) AS z GROUP BY pos HAVING COUNT(*) > 30 AND ORDER BY wr DESC LIMIT 20')
+	cursor.execute(query)
+	for (i, w) in cursor:
+		myl.append((ID2NAME[str(i)],w))
+	cursor.close()
+	cnx.close()
+	return myl
+
+#find highest win rates to use to suggest bans
+def findbans():
+	results = []
+	myl = []
+	cnx = mysql.connect()
+	cursor = cnx.cursor()
+	query = ('SELECT pos, AVG(w) AS wr FROM ( ( SELECT top1 AS pos, win AS w FROM games ) UNION ALL ( SELECT jungle1 AS pos, win AS w FROM games ) UNION ALL ( SELECT mid1 AS pos, win AS w FROM games ) UNION ALL ( SELECT bot1 AS pos, win AS w FROM games )  UNION ALL ( SELECT supp1 AS pos, win AS w FROM games ) UNION ALL ( SELECT top2 AS pos, IF( win = 0, 1, 0 ) AS w FROM games ) UNION ALL ( SELECT jungle2 AS pos, IF( win = 0, 1, 0 ) AS w FROM games ) UNION ALL ( SELECT mid2 AS pos, IF( win = 0, 1, 0 ) AS w FROM games ) UNION ALL ( SELECT bot2 AS pos, IF( win = 0, 1, 0 ) AS w FROM games ) UNION ALL ( SELECT supp2 AS pos, IF( win = 0, 1, 0 ) AS w FROM games ) ) AS z GROUP BY pos ORDER BY wr DESC LIMIT 20')
+	cursor.execute(query)
+	for (i, w) in cursor:
+		myl.append((ID2NAME[str(i)],w))
+	cursor.close()
+	cnx.close()
+	return myl
+
+
+
 @application.route("/")
 def main():
 	return render_template('index.html')
@@ -30,7 +460,7 @@ def bottomvssupport():
 	
 @application.route('/bans')
 def suggestbans():
-	results = dbfuncs.findbans()
+	results = findbans()
 	mystr = ''
 	for (n, w) in results:
 				mystr += (str(n) + ': ' + str(w) + '<br/>')
@@ -54,10 +484,10 @@ def bottomwwithsupportresults():
 				raise Exception('invalid champion name')
 		else:
 			tempname = _champ
-		results = dbfuncs.findbws(_name, tempname)
+		results = findbws(_name, tempname)
 		mystr = ''
 		if len(results) == 0:
-			results = dbfuncs.findbwsavailable(tempname) 
+			results = findbwsavailable(tempname) 
 			for (n, w) in results:
 				mystr += (str(n) + ': ' + str(w) + '<br/>')
 		else:
@@ -85,10 +515,10 @@ def supportwithbottomresults():
 				raise Exception('invalid champion name')
 		else:
 			tempname = _champ
-		results = dbfuncs.findswb(_name, tempname)
+		results = findswb(_name, tempname)
 		mystr = ''
 		if len(results) == 0:
-			results = dbfuncs.findswbavailable(tempname) 
+			results = findswbavailable(tempname) 
 			for (n, w) in results:
 				mystr += (str(n) + ': ' + str(w) + '<br/>')
 		else:
@@ -116,10 +546,10 @@ def junglewithmiddleresults():
 				raise Exception('invalid champion name')
 		else:
 			tempname = _champ
-		results = dbfuncs.findjwm(_name, tempname)
+		results = findjwm(_name, tempname)
 		mystr = ''
 		if len(results) == 0:
-			results = dbfuncs.findjwmavailable(tempname) 
+			results = findjwmavailable(tempname) 
 			for (n, w) in results:
 				mystr += (str(n) + ': ' + str(w) + '<br/>')
 		else:
@@ -147,10 +577,10 @@ def middlewithjungleresults():
 				raise Exception('invalid champion name')
 		else:
 			tempname = _champ
-		results = dbfuncs.findmwj(_name, tempname)
+		results = findmwj(_name, tempname)
 		mystr = ''
 		if len(results) == 0:
-			results = dbfuncs.findmwjavailable(tempname) 
+			results = findmwjavailable(tempname) 
 			for (n, w) in results:
 				mystr += (str(n) + ': ' + str(w) + '<br/>')
 		else:
@@ -178,10 +608,10 @@ def junglewithtopresults():
 				raise Exception('invalid champion name')
 		else:
 			tempname = _champ
-		results = dbfuncs.findjwt(_name, tempname)
+		results = findjwt(_name, tempname)
 		mystr = ''
 		if len(results) == 0:
-			results = dbfuncs.findjwtavailable(tempname) 
+			results = findjwtavailable(tempname) 
 			for (n, w) in results:
 				mystr += (str(n) + ': ' + str(w) + '<br/>')
 		else:
@@ -209,10 +639,10 @@ def topwithjungleresults():
 				raise Exception('invalid champion name')
 		else:
 			tempname = _champ
-		results = dbfuncs.findtwj(_name, tempname)
+		results = findtwj(_name, tempname)
 		mystr = ''
 		if len(results) == 0:
-			results = dbfuncs.findtwjavailable(tempname) 
+			results = findtwjavailable(tempname) 
 			for (n, w) in results:
 				mystr += (str(n) + ': ' + str(w) + '<br/>')
 		else:
@@ -236,10 +666,10 @@ def supportvsbottomresults():
 				raise Exception('invalid champion name')
 		else:
 			tempname = _champ
-		results = dbfuncs.findsvb(_name, tempname)
+		results = findsvb(_name, tempname)
 		mystr = ''
 		if len(results) == 0:
-			results = dbfuncs.findsvbavailable(tempname) 
+			results = findsvbavailable(tempname) 
 			for (n, w) in results:
 				mystr += (str(n) + ': ' + str(w) + '<br/>')
 		else:
@@ -263,10 +693,10 @@ def bottomvssupportresults():
 				raise Exception('invalid champion name')
 		else:
 			tempname = _champ
-		results = dbfuncs.findbvs(_name, tempname)
+		results = findbvs(_name, tempname)
 		mystr = ''
 		if len(results) == 0:
-			results = dbfuncs.findbvsavailable(tempname) 
+			results = findbvsavailable(tempname) 
 			for (n, w) in results:
 				mystr += (str(n) + ': ' + str(w) + '<br/>')
 		else:
@@ -297,7 +727,7 @@ def lookuprestuls():
 				postemp = posnn[_position.lower()]
 		else:
 			postemp = _position.lower()
-		results = dbfuncs.findlook(tempname, postemp)
+		results = findlook(tempname, postemp)
 		mystr = ''
 		for (n, w) in results:
 			mystr += (str(n) + ': ' + str((1.0-float(w))) + '<br/>')
@@ -328,10 +758,10 @@ def apptest():
 		else:
 			postemp = _position.lower()
 		mystr = ''
-		results = dbfuncs.suggestion(tempname, _name, postemp)
+		results = suggestion(tempname, _name, postemp)
 		
 		if len(results) == 0:
-			results = dbfuncs.findbestavailable(postemp, NAME2ID[tempname])
+			results = findbestavailable(postemp, NAME2ID[tempname])
 			for (n, w) in results:
 				mystr += (str(n) + ': ' + str(w) + '<br/>')
 		else:
@@ -363,10 +793,10 @@ def basicblindsuggestionresults():
 				postemp = posnn[_position.lower()]
 		else:
 			postemp = _position.lower()
-		results = dbfuncs.findbasicblind(_name, postemp)
+		results = findbasicblind(_name, postemp)
 		mystr = ''
 		if len(results) == 0:
-			results = dbfuncs.findbasicblindavailable(tempname) 
+			results = findbasicblindavailable(tempname) 
 			for (n, w) in results:
 				mystr += (str(n) + ': ' + str(w) + '<br/>')
 		else:
@@ -403,7 +833,7 @@ def counterstobanresults():
 		else:
 			postemp = _position.lower()
 		mystr = ''
-		results = dbfuncs.findbestavailable(postemp, champid)
+		results = findbestavailable(postemp, champid)
 		for k in results:
 			mystr += (str(k[0])+ ': ' + str(k[1]) + '<br/>')
 		return '<head>' + '<title>League of Legends Suggestion</title>' + '<link href="../static/bootstrap.min.css" rel="stylesheet">' + '<link href="../static/jumbotron-narrow.css" rel="stylesheet">' + '</head>' + '<body>' + '<div class="container">' + '<div class="header">' + '<nav>' + '<ul class="nav nav-pills pull-right">' + '<li role="presentation" class="active"><a href="/">Home</a></li>' + '<li role="presentation"><a href="/c2b">Back</a></li>' + '</ul>' + '</nav>' + '<h3 class="text-muted">League of Legends Suggestion App</h3>' + '</div>' + '<div class="jumbotron">' + '<h1>Counter Pick to Ban</h1>' + '<h9>' + mystr + '</h9>' + '</div>' + '</div>' + '</body>' 
