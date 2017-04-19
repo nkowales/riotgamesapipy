@@ -840,6 +840,10 @@ def counterstobanresults():
 	except Exception as e:
 		return json.dumps('<span>'+str(e)+'</span>')
 
+@app.route('//riot.txt')
+def riotverification():
+	return current_app.send_static_file('riot.txt')
+	
 
 if __name__ == "__main__":
 	application.run()
