@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>League of Legends Suggestion</title>
+ 
+    
+    <link href="../static/bootstrap.min.css" rel="stylesheet">
+    <link href="../static/jumbotron-narrow.css" rel="stylesheet">
+    <link href="../static/basic.css" rel="stylesheet">
+    
+  </head>
+ 
+  <body>
+ 
+    <div class="container">
+      <div class="header">
+        <nav>
+          <ul class="nav nav-pills pull-right">
+            <li role="presentation" class="active"><a href="/">Home</a></li>
+          </ul>
+        </nav>
+        <h3 class="text-muted">League of Legends Suggestion App</h3>
+      </div>
+ 
+      <div class="jumbotron">
+        <h1>Pick Suggestion From Champion Win Rates Against Lane Opponent's Champion</h1>
+        <form class="form-signin" action="/c2br" method="post">
+        <label for="inputChamp" class="sr-only">Champion</label>
+        <input type="champ" name="inputChamp" id="inputChamp" class="form-control" placeholder="Champion" required autofocus>
+        <label for="inputPos" class="sr-only">Position</label>
+        <input type="position" name="inputPos" id="inputPos" class="form-control" placeholder="Position" required>
+        <input type="submit" value="Go"></input>
+        </form> 
+      </div>
+ 
+    </div>
+  </body>
+</html>

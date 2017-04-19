@@ -463,10 +463,6 @@ def findbasicblindavailable(champname):
 	cnx.close()
 	return myl
 
-
-
-
-#IF( win = 0, 1, 0 )
 #find highest win rates to use to suggest bans
 def findbans():
 	results = []

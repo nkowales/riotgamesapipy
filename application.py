@@ -276,9 +276,6 @@ def bottomvssupportresults():
 	except Exception as e:
 		return json.dumps('<span>'+str(e)+'</span>')
 
-
-
-
 @application.route('/lookupresults',methods=['POST'])
 def lookuprestuls():
 	_champ = request.form['inputChamp']
@@ -308,8 +305,6 @@ def lookuprestuls():
 	except Exception as e:
 		return json.dumps('<span>'+str(e)+'</span>')
 		
-		
-
 @application.route('/apptest',methods=['POST'])
 def apptest():
 	_name = request.form['inputName']
@@ -381,6 +376,39 @@ def basicblindsuggestionresults():
 	except Exception as e:
 		return json.dumps('<span>'+str(e)+'</span>')
 
+@application.route('/c2b')
+def counterstoban():
+	return render_template('counters2ban.html')
+
+@application.route('/c2br',methods=['POST'])
+def counterstobanresults():
+	_champ = request.form['inputChamp']
+	_position = request.form['inputPos']
+	try:
+		if _champ not in NAME2ID:
+			if _champ in ID2NAME:
+				tempname = ID2NAME[_champ]
+			elif _champ.lower() in NICKNAMES2NAMES:
+				tempname = NICKNAMES2NAMES[_champ.lower()]
+			else:
+				raise Exception('invalid champion name')
+		else:
+			tempname = _champ
+		champid = NAME2ID[tempname]
+		if _position.lower() not in pos:
+			if _position.lower() not in posnn:
+				raise Exception('invalid position')
+			else:
+				postemp = posnn[_position.lower()]
+		else:
+			postemp = _position.lower()
+		mystr = ''
+		results = dbfuncs.findbestavailable(postemp, champid)
+		for k in results:
+			mystr += (str(k[0])+ ': ' + str(k[1]) + '<br/>')
+		return '<head>' + '<title>League of Legends Suggestion</title>' + '<link href="../static/bootstrap.min.css" rel="stylesheet">' + '<link href="../static/jumbotron-narrow.css" rel="stylesheet">' + '</head>' + '<body>' + '<div class="container">' + '<div class="header">' + '<nav>' + '<ul class="nav nav-pills pull-right">' + '<li role="presentation" class="active"><a href="/">Home</a></li>' + '<li role="presentation"><a href="/c2b">Back</a></li>' + '</ul>' + '</nav>' + '<h3 class="text-muted">League of Legends Suggestion App</h3>' + '</div>' + '<div class="jumbotron">' + '<h1>Counter Pick to Ban</h1>' + '<h9>' + mystr + '</h9>' + '</div>' + '</div>' + '</body>' 
+	except Exception as e:
+		return json.dumps('<span>'+str(e)+'</span>')
 
 
 if __name__ == "__main__":
