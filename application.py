@@ -24,6 +24,18 @@ def lookup():
 def supportvsbottom():
 	return render_template('suppvbot.html')
 	
+@application.route('/bvs')
+def bottomvssupport():
+	return render_template('botvsupp.html')
+	
+@application.route('/bans')
+def suggestbans():
+	results = dbfuncs.findbans()
+	mystr = ''
+	for (n, w) in results:
+				mystr += (str(n) + ': ' + str(w) + '<br/>')
+	return '<head>' + '<title>League of Legends Suggestion</title>' + '<link href="../static/bootstrap.min.css" rel="stylesheet">' + '<link href="../static/jumbotron-narrow.css" rel="stylesheet">' + '</head>' + '<body>' + '<div class="container">' + '<div class="header">' + '<nav>' + '<ul class="nav nav-pills pull-right">' + '<li role="presentation" class="active"><a href="/">Home</a></li>' + '</ul>' + '</nav>' + '<h3 class="text-muted">League of Legends Suggestion App</h3>' + '</div>' + '<div class="jumbotron">' + '<h1>Suggested Bans</h1>' + '<h9>' + mystr + '</h9>' + '</div>' + '</div>' + '</body>' 
+
 @application.route('/svbr',methods=['POST'])
 def supportvsbottomresults():
 	_name = request.form['inputName']
@@ -50,6 +62,36 @@ def supportvsbottomresults():
 		return '<head>' + '<title>League of Legends Suggestion</title>' + '<link href="../static/bootstrap.min.css" rel="stylesheet">' + '<link href="../static/jumbotron-narrow.css" rel="stylesheet">' + '</head>' + '<body>' + '<div class="container">' + '<div class="header">' + '<nav>' + '<ul class="nav nav-pills pull-right">' + '<li role="presentation" class="active"><a href="/">Home</a></li>' + '<li role="presentation"><a href="/svb">Back</a></li>' + '</ul>' + '</nav>' + '<h3 class="text-muted">League of Legends Suggestion App</h3>' + '</div>' + '<div class="jumbotron">' + '<h1>Results</h1>' + '<h9>' + mystr + '</h9>' + '</div>' + '</div>' + '</body>' 
 	except Exception as e:
 		return json.dumps('<span>'+str(e)+'</span>')
+
+@application.route('/bvsr',methods=['POST'])
+def bottomvssupportresults():
+	_name = request.form['inputName']
+	_champ = request.form['inputChamp']
+	try:
+		if _champ not in NAME2ID:
+			if _champ in ID2NAME:
+				tempname = ID2NAME[_champ]
+			elif _champ.lower() in NICKNAMES2NAMES:
+				tempname = NICKNAMES2NAMES[_champ.lower()]
+			else:
+				raise Exception('invalid champion name')
+		else:
+			tempname = _champ
+		results = dbfuncs.findbvs(_name, tempname)
+		mystr = ''
+		if len(results) == 0:
+			results = dbfuncs.findbvsavailable(tempname) 
+			for (n, w) in results:
+				mystr += (str(n) + ': ' + str(w) + '<br/>')
+		else:
+			for k in results:
+				mystr += (str(k[0])+ ': ' + str(k[2]) + '<br/>')
+		return '<head>' + '<title>League of Legends Suggestion</title>' + '<link href="../static/bootstrap.min.css" rel="stylesheet">' + '<link href="../static/jumbotron-narrow.css" rel="stylesheet">' + '</head>' + '<body>' + '<div class="container">' + '<div class="header">' + '<nav>' + '<ul class="nav nav-pills pull-right">' + '<li role="presentation" class="active"><a href="/">Home</a></li>' + '<li role="presentation"><a href="/bvs">Back</a></li>' + '</ul>' + '</nav>' + '<h3 class="text-muted">League of Legends Suggestion App</h3>' + '</div>' + '<div class="jumbotron">' + '<h1>Results</h1>' + '<h9>' + mystr + '</h9>' + '</div>' + '</div>' + '</body>' 
+	except Exception as e:
+		return json.dumps('<span>'+str(e)+'</span>')
+
+
+
 
 @application.route('/lookupresults',methods=['POST'])
 def lookuprestuls():

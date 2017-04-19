@@ -175,3 +175,57 @@ def findsvbavailable(champname):
 	cursor.close()
 	cnx.close()
 	return myl
+
+#given enemy support suggest bot lane pick
+def findbvs(sname, champname):
+	results = []
+	champid = NAME2ID[champname]
+	myd = {}
+	cnx = mysql.connector.connect(user=info.USER, password=info.PASSWORD, host=info.HOST, database=info.DATABASE, port=info.PORT)
+	cursor = cnx.cursor()
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, supp2 AS pos1, bot1 AS pos2, win AS w FROM games WHERE supp2 = ' + champid + ' ) UNION ALL ( SELECT gameid, supp1 AS pos1, bot2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE supp1 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 AND wr > .5 ORDER BY wr DESC')
+	cursor.execute(query)
+	for (i, w) in cursor:
+		myd[int(i)] = float(w)
+	cursor.close()
+	cnx.close()
+	
+	favs = getmastery(sname)
+	for i in favs:
+		if i[0] in myd:
+			results.append((ID2NAME[str(i[0])], i[1], myd[i[0]]))
+			results.sort(key=lambda tup: tup[1], reverse=True)
+	return results
+
+#given enemy support suggest bot lane pick
+def findbvsavailable(champname):
+	results = []
+	champid = NAME2ID[champname]
+	myl = []
+	cnx = mysql.connector.connect(user=info.USER, password=info.PASSWORD, host=info.HOST, database=info.DATABASE, port=info.PORT)
+	cursor = cnx.cursor()
+	query = ('SELECT pos2, AVG(w) AS wr FROM ( ( SELECT gameid, supp2 AS pos1, bot1 AS pos2, win AS w FROM games WHERE supp2 = ' + champid + ' ) UNION ALL ( SELECT gameid, supp1 AS pos1, bot2 AS pos2, IF( win = 0, 1, 0 ) AS w FROM games WHERE supp1 = ' + champid + ' ) ) AS z GROUP BY pos2 HAVING COUNT(*) > 30 ORDER BY wr DESC LIMIT 20')
+	cursor.execute(query)
+	for (i, w) in cursor:
+		myl.append((ID2NAME[str(i)],w))
+	cursor.close()
+	cnx.close()
+	return myl
+
+
+
+
+#IF( win = 0, 1, 0 )
+#find highest win rates to use to suggest bans
+def findbans():
+	results = []
+	myl = []
+	cnx = mysql.connector.connect(user=info.USER, password=info.PASSWORD, host=info.HOST, database=info.DATABASE, port=info.PORT)
+	cursor = cnx.cursor()
+	query = ('SELECT pos, AVG(w) AS wr FROM ( ( SELECT top1 AS pos, win AS w FROM games ) UNION ALL ( SELECT jungle1 AS pos, win AS w FROM games ) UNION ALL ( SELECT mid1 AS pos, win AS w FROM games ) UNION ALL ( SELECT bot1 AS pos, win AS w FROM games )  UNION ALL ( SELECT supp1 AS pos, win AS w FROM games ) UNION ALL ( SELECT top2 AS pos, IF( win = 0, 1, 0 ) AS w FROM games ) UNION ALL ( SELECT jungle2 AS pos, IF( win = 0, 1, 0 ) AS w FROM games ) UNION ALL ( SELECT mid2 AS pos, IF( win = 0, 1, 0 ) AS w FROM games ) UNION ALL ( SELECT bot2 AS pos, IF( win = 0, 1, 0 ) AS w FROM games ) UNION ALL ( SELECT supp2 AS pos, IF( win = 0, 1, 0 ) AS w FROM games ) ) AS z GROUP BY pos ORDER BY wr DESC LIMIT 20')
+	cursor.execute(query)
+	for (i, w) in cursor:
+		myl.append((ID2NAME[str(i)],w))
+	cursor.close()
+	cnx.close()
+	return myl
