@@ -1,4 +1,4 @@
-from flask import Flask, render_template, json, request, redirect
+from flask import Flask, render_template, json, request, redirect, send_from_directory, url_for
 from flask.ext.mysql import MySQL
 from id2name import NAME2ID
 from id2name import ID2NAME
@@ -19,6 +19,7 @@ application.config['MYSQL_DATABASE_USER'] = info.USER
 application.config['MYSQL_DATABASE_PASSWORD'] = info.PASSWORD
 application.config['MYSQL_DATABASE_DB'] = info.DATABASE
 application.config['MYSQL_DATABASE_HOST'] = info.HOST
+application.config['UPLOAD_FOLDER'] = '//'
 mysql.init_app(application)
 
 
@@ -840,9 +841,13 @@ def counterstobanresults():
 	except Exception as e:
 		return json.dumps('<span>'+str(e)+'</span>')
 
-@app.route('//riot.txt')
-def riotverification():
-	return current_app.send_static_file('riot.txt')
+@application.route('//<filename>')
+def riotverification(filename):
+	return application.send_static_file('riot.txt')
+	
+@application.route('/<path:path>')
+def static_proxy(path):
+	return application.send_static_file(path)
 	
 
 if __name__ == "__main__":
